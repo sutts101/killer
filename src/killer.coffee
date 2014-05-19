@@ -3,9 +3,7 @@ class Sudoku
   constructor: (values) ->
     @size = Math.sqrt(values.length)
     throw new Error "That's not a valid square you bozo" unless Math.round(@size) is @size
-    @cells = []
-    for index in [0...values.length]
-      @cells.push new Cell(this, index, values[index])
+    @cells = values.map (value,index) -> new Cell this, index, value
 
   cell_at: (row, col) ->
     @cells[(row * @size) + col]
@@ -23,17 +21,17 @@ class Cell
 
 class Killer
 
-  constructor: (@sudoku, regionsArray) ->
+  constructor: (@sudoku, regionIds) ->
     @regions = []
-    for index in [0...regionsArray.length]
-      cell = @sudoku.cell_at_index(index)
-      regionId = regionsArray[index]
+    for regionId,index in regionIds
       if regionId is @regions.length + 1
         region = new Region(regionId)
         @regions.push region
-      region = @regions[regionId-1]
+      region = @regions[regionId - 1]
+      cell = @sudoku.cell_at_index(index)
       region.push cell
       cell.region = region
+
 
 class Region
 
