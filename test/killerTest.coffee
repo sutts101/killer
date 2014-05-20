@@ -40,6 +40,11 @@ describe 'Sudoku', ->
 
 describe 'Killer', ->
 
+  describe 'constructor (unhappy path)', ->
+
+    it 'should complain if regions array does not match values array', ->
+      ( -> new Killer new Sudoku([1,2,3,4]), [1,2,3] ).should.throw "Wrong number of regions you bozo"
+
   describe 'constructor (happy path)', ->
 
     sudoku = new Sudoku [

@@ -22,16 +22,16 @@ class Cell
 class Killer
 
   constructor: (@sudoku, regionIds) ->
-    @regions = []
+    throw new Error "Incorrect number of regions you bozo" unless regionIds.length is @sudoku.cells.length
+    @regions= []
     for regionId,index in regionIds
-      if regionId is @regions.length + 1
-        region = new Region(regionId)
-        @regions.push region
-      region = @regions[regionId - 1]
       cell = @sudoku.cell_at_index(index)
+      region = (@regions.filter (r) -> r.id is regionId)[0]
+      unless region
+        region = new Region regionId
+        @regions.push region
       region.push cell
       cell.region = region
-
 
 class Region
 
