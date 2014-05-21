@@ -15,8 +15,13 @@ class Cell
 
   constructor: (@sudoku, @index, @value) ->
 
-  to_s: ->
-    "#{@index}:#{@value}"
+  to_s: -> "#{@index}:#{@value}"
+
+  row: -> Math.floor(@index / @sudoku.size)
+
+  col: -> @index % @sudoku.size
+
+  is_next_to: (cell) -> @col() is cell.col() or @row() is cell.row()
 
 
 class Killer
@@ -39,6 +44,8 @@ class Region
     @cells = []
 
   push: (cell) ->
+    previous = @cells[@cells.length - 1]
+#    throw new Error 'Bozo' if previous # and not previous.is_next_to cell
     @cells.push cell
 
   sum: () ->
