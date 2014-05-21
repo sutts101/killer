@@ -15,8 +15,6 @@ class Cell
 
   constructor: (@sudoku, @index, @value) ->
 
-  to_s: -> "#{@index}:#{@value}"
-
   row: -> Math.floor(@index / @sudoku.size)
 
   col: -> @index % @sudoku.size
