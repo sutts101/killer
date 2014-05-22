@@ -3,7 +3,7 @@ class Sudoku
   constructor: (values) ->
     @size = Math.sqrt(values.length)
     throw new Error "That's not a valid square you bozo" unless Math.round(@size) is @size
-    @cells = values.map (value,index) -> new Cell this, index, value
+    @cells = values.map (value,index) => new Cell this, index, value
 
   cell_at: (row, col) ->
     @cells[(row * @size) + col]
