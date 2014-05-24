@@ -21,6 +21,10 @@ class Cell
 
   is_next_to: (cell) -> @col() is cell.col() or @row() is cell.row()
 
+  up:    -> @sudoku.cell_at @row() - 1, @col()
+  down:  -> @sudoku.cell_at @row() + 1, @col()
+  left:  -> @sudoku.cell_at @row(),     @col() - 1 unless @col() == 0
+  right: -> @sudoku.cell_at @row(),     @col() + 1 unless @col() >= (@sudoku.size - 1)
 
 class Killer
 
@@ -49,6 +53,9 @@ class Region
   sum: () ->
     values = @cells.map (cell) -> cell.value
     values.reduce (x,y) -> x + y
+
+  contains: (cell) ->
+    cell in @cells
 
   to_s: ->
     "Region #{@id}: #{@cells}"

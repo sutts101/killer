@@ -38,6 +38,31 @@ describe 'Sudoku', ->
         sudoku.cell_at_index(3).value.should.equal 4
         sudoku.cell_at_index(8).value.should.equal 9
 
+    describe 'cell movement', ->
+
+      move_and_expect_cell = (start_row, start_column, movement, end_row, end_column) ->
+        start_cell = sudoku.cell_at start_row, start_column
+        end_cell = start_cell[movement]()
+        end_cell.row().should.equal end_row
+        end_cell.col().should.equal end_column
+
+      it "should go up, down, left and right when it can", ->
+        move_and_expect_cell 1, 1, 'up',    0, 1
+        move_and_expect_cell 1, 1, 'down',  2, 1
+        move_and_expect_cell 1, 1, 'left',  1, 0
+        move_and_expect_cell 1, 1, 'right', 1, 2
+
+      move_and_expect_undefined = (start_row, start_column, movement, end_row, end_column) ->
+        start_cell = sudoku.cell_at start_row,start_column
+        end_cell = start_cell[movement]()
+        (end_cell is undefined).should.be.true
+
+      it "should not go up, down, left and right when it can't", ->
+        move_and_expect_undefined 0, 1, 'up'
+        move_and_expect_undefined 2, 1, 'down'
+        move_and_expect_undefined 1, 0, 'left'
+        move_and_expect_undefined 1, 2, 'right'
+
 describe 'Cell', ->
 
   it 'should know its row based on index and size of the sudoku grid', ->
@@ -60,7 +85,6 @@ describe 'Cell', ->
     cells[1].is_next_to(cells[0]).should.equal true
     cells[2].is_next_to(cells[0]).should.equal true
     cells[3].is_next_to(cells[0]).should.equal false
-
 
 
 describe 'Killer', ->
@@ -104,6 +128,21 @@ describe 'Region', ->
       region.push(new Cell {size: 4}, 0, 3)
       region.push(new Cell {size: 9}, 1, 4)
       region.sum().should.equal 7
+
+  describe "contains", ->
+
+    cell1 = new Cell {size: 4}, 0, 3
+    cell2 = new Cell {size: 4}, 1, 3
+    cell3 = new Cell {size: 4}, 2, 3
+    region = new Region 'whatever'
+    region.push cell1
+    region.push cell2
+
+    it "should know whether a cell is contained or not", ->
+      region.contains(cell1).should.be.true
+      region.contains(cell2).should.be.true
+      region.contains(cell3).should.be.false
+
 
   describe 'well formed', ->
 
