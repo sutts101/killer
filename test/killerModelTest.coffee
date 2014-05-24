@@ -1,4 +1,4 @@
-{Sudoku, Cell, Killer, Region} = require '../src/killer'
+{Sudoku, Cell, Killer, Region} = require '../src/killerModel'
 
 chai = require 'chai'
 chai.should()
@@ -57,7 +57,7 @@ describe 'Sudoku', ->
         end_cell = start_cell[movement]()
         (end_cell is undefined).should.be.true
 
-      it "should not go up, down, left and right when it can't", ->
+      it "should not go up, down, left or right when it can't", ->
         move_and_expect_undefined 0, 1, 'up'
         move_and_expect_undefined 2, 1, 'down'
         move_and_expect_undefined 1, 0, 'left'
