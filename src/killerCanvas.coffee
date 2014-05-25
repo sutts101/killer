@@ -132,7 +132,11 @@ class KillerCanvas
       if evt.keyCode in [49..57]
         @focusCell.enter value
         @redraw()
-
+      else if evt.keyCode in [37..40]
+        movement = {37: 'left', 38: 'up', 39: 'right', 40: 'down'}[evt.keyCode]
+        if @focusCell[movement]()?
+          @focusCell = @focusCell[movement]()
+          @redraw()
 
 root = exports ? window
 root.KillerCanvas = KillerCanvas
