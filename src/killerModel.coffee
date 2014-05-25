@@ -14,6 +14,7 @@ class Sudoku
 class Cell
 
   constructor: (@sudoku, @index, @value) ->
+    @entries = []
 
   row: -> Math.floor(@index / @sudoku.size)
 
@@ -25,6 +26,15 @@ class Cell
   down:  -> @sudoku.cell_at @row() + 1, @col()
   left:  -> @sudoku.cell_at @row(),     @col() - 1 unless @col() == 0
   right: -> @sudoku.cell_at @row(),     @col() + 1 unless @col() >= (@sudoku.size - 1)
+
+  enter: (value) ->
+    if value in @entries
+      @entries = @entries.filter (e) -> e isnt value
+    else
+      @entries.push value
+
+  entriesAsString: () ->
+    @entries.join ''
 
 class Killer
 
@@ -56,10 +66,6 @@ class Region
 
   contains: (cell) ->
     cell in @cells
-
-  to_s: ->
-    "Region #{@id}: #{@cells}"
-
 
 root = exports ? window
 root.Sudoku = Sudoku

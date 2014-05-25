@@ -86,6 +86,31 @@ describe 'Cell', ->
     cells[2].is_next_to(cells[0]).should.equal true
     cells[3].is_next_to(cells[0]).should.equal false
 
+  describe 'entries', ->
+
+    makeCell = () ->
+      cell = new Cell( {size: 9},  0, 2)
+
+    it "should start out empty", ->
+      makeCell().entriesAsString().should.equal ''
+
+    it "should accept an entry", ->
+      cell = makeCell()
+      cell.enter 1
+      cell.entriesAsString().should.equal '1'
+
+    it "should accept another entry", ->
+      cell = makeCell()
+      cell.enter 1
+      cell.enter 2
+      cell.entriesAsString().should.equal '12'
+
+    it "should toggle entered values", ->
+      cell = makeCell()
+      cell.enter 1
+      cell.enter 2
+      cell.enter 1
+      cell.entriesAsString().should.equal '2'
 
 describe 'Killer', ->
 
