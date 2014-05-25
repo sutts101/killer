@@ -20,6 +20,7 @@ class KillerCanvas
 
   model: (@killer) ->
     @sudoku = @killer.sudoku
+    @focusCell = @sudoku.cell_at 0, 0
     @redraw()
 
   redraw: () =>
@@ -137,6 +138,10 @@ class KillerCanvas
         if @focusCell[movement]()?
           @focusCell = @focusCell[movement]()
           @redraw()
+      else if evt.keyCode = 67
+        @focusCell.entries.length = 0
+        @redraw()
+
 
 root = exports ? window
 root.KillerCanvas = KillerCanvas
