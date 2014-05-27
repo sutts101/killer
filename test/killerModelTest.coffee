@@ -3,16 +3,29 @@
 chai = require 'chai'
 chai.should()
 
+A_VALID_4x4_GRID = [
+  1,2,3,4,
+  2,3,4,1,
+  3,4,1,2,
+  4,1,2,3
+]
+
 describe "Sudoku", ->
 
-  A_VALID_4x4_GRID = [
-    1,2,3,4,
-    2,3,4,1,
-    3,4,1,2,
-    4,1,2,3
-  ]
+  describe "construction", ->
 
-  describe "constructor", ->
+    it "should allow access to cells by row and column", ->
+      sudoku = new Sudoku A_VALID_4x4_GRID
+      sudoku.cellAt(0,0).value.should.equal 1
+      sudoku.cellAt(3,3).value.should.equal 3
+
+    it "should also, of course, set the right row and column values", ->
+      sudoku = new Sudoku A_VALID_4x4_GRID
+      for row in [0...sudoku.size]
+        for col in [0...sudoku.size]
+          cell = sudoku.cellAt row, col
+          cell.row.should.equal row
+          cell.col.should.equal col
 
     it "should like square squares", ->
       new Sudoku [1]
@@ -32,38 +45,6 @@ describe "Sudoku", ->
       new Sudoku([1]).root.should.equal 1
       new Sudoku(A_VALID_4x4_GRID).root.should.equal 2
 
-    it "should allow access to cells by row and column", ->
-      sudoku = new Sudoku A_VALID_4x4_GRID
-      sudoku.cellAt(0,0).value.should.equal 1
-      sudoku.cellAt(1,0).value.should.equal 2
-      sudoku.cellAt(3,3).value.should.equal 3
-
-  describe "cell movement", ->
-
-    sudoku = new Sudoku A_VALID_4x4_GRID
-
-    move_and_expect_cell = (start_row, start_column, movement, end_row, end_column) ->
-      start_cell = sudoku.cellAt start_row, start_column
-      end_cell = start_cell[movement]()
-      end_cell.row().should.equal end_row
-      end_cell.col().should.equal end_column
-
-    it "should go up, down, left and right when it can", ->
-      move_and_expect_cell 1, 1, 'up',    0, 1
-      move_and_expect_cell 1, 1, 'down',  2, 1
-      move_and_expect_cell 1, 1, 'left',  1, 0
-      move_and_expect_cell 1, 1, 'right', 1, 2
-
-    move_and_expect_undefined = (start_row, start_column, movement) ->
-      start_cell = sudoku.cellAt start_row,start_column
-      end_cell = start_cell[movement]()
-      (end_cell is undefined).should.be.true
-
-    it "should not go up, down, left or right when it can't", ->
-      move_and_expect_undefined 0, 1, 'up'
-      move_and_expect_undefined 3, 1, 'down'
-      move_and_expect_undefined 1, 0, 'left'
-      move_and_expect_undefined 1, 3, 'right'
 
   describe "blocks", ->
 
@@ -91,36 +72,46 @@ describe "Sudoku", ->
         for index in [0..3]
           sudoku[blockType][index].sum().should.equal 10
 
+  describe "cell movement", ->
+
+    sudoku = new Sudoku A_VALID_4x4_GRID
+
+    move_and_expect_cell = (start_row, start_column, movement, end_row, end_column) ->
+      start_cell = sudoku.cellAt start_row, start_column
+      end_cell = start_cell[movement]()
+      end_cell.row.should.equal end_row
+      end_cell.col.should.equal end_column
+
+    it "should go up, down, left and right when it can", ->
+      move_and_expect_cell 1, 1, 'up',    0, 1
+      move_and_expect_cell 1, 1, 'down',  2, 1
+      move_and_expect_cell 1, 1, 'left',  1, 0
+      move_and_expect_cell 1, 1, 'right', 1, 2
+
+    move_and_expect_undefined = (start_row, start_column, movement) ->
+      start_cell = sudoku.cellAt start_row, start_column
+      end_cell = start_cell[movement]()
+      (end_cell is undefined).should.be.true
+
+    it "should not go up, down, left or right when it can't", ->
+      move_and_expect_undefined 0, 1, 'up'
+      move_and_expect_undefined 3, 1, 'down'
+      move_and_expect_undefined 1, 0, 'left'
+      move_and_expect_undefined 1, 3, 'right'
 
 describe "Cell", ->
 
-  MOCK_4x4_SUDOKU = {size: 4, root: 2}
-
-  it "should know its row based on index and size of the sudoku grid", ->
-    new Cell( MOCK_4x4_SUDOKU,  0, 2).row().should.equal 0
-    new Cell( MOCK_4x4_SUDOKU,  3, 2).row().should.equal 0
-    new Cell( MOCK_4x4_SUDOKU,  4, 2).row().should.equal 1
-    new Cell( MOCK_4x4_SUDOKU, 15, 2).row().should.equal 3
-
-  it "should know its column based on index and size of the sudoku grid", ->
-    new Cell( MOCK_4x4_SUDOKU,  0, 2).col().should.equal 0
-    new Cell( MOCK_4x4_SUDOKU,  1, 2).col().should.equal 1
-    new Cell( MOCK_4x4_SUDOKU,  5, 2).col().should.equal 1
-    new Cell( MOCK_4x4_SUDOKU, 15, 2).col().should.equal 3
-
   it "should recognise contiguous cells", ->
-    cells = [1,2,3,4].map (value,index) -> new Cell({size: 2}, index, value)
-    cells[0].is_next_to(cells[1]).should.equal true
-    cells[0].is_next_to(cells[2]).should.equal true
-    cells[0].is_next_to(cells[3]).should.equal false
-    cells[1].is_next_to(cells[0]).should.equal true
-    cells[2].is_next_to(cells[0]).should.equal true
-    cells[3].is_next_to(cells[0]).should.equal false
+    sudoku = new Sudoku A_VALID_4x4_GRID
+    sudoku.cellAt(0,0).isNextTo(sudoku.cellAt(0,1)).should.equal true
+    sudoku.cellAt(0,0).isNextTo(sudoku.cellAt(1,0)).should.equal true
+    sudoku.cellAt(0,0).isNextTo(sudoku.cellAt(1,1)).should.equal false
+    sudoku.cellAt(0,0).isNextTo(sudoku.cellAt(0,2)).should.equal false
 
   describe "entries", ->
 
     makeCell = () ->
-      cell = new Cell( MOCK_4x4_SUDOKU, 0, 2)
+      cell = new Cell {}, 0, 2
 
     it "should start out empty", ->
       makeCell().entriesAsString().should.equal ''
@@ -185,15 +176,15 @@ describe "Region", ->
 
     it "should be the sum of the values of the contained cells", ->
       region = new Region('whatever')
-      region.push(new Cell MOCK_VALID_SUDOKU, 0, 3)
-      region.push(new Cell MOCK_VALID_SUDOKU, 1, 4)
+      region.push new Cell MOCK_VALID_SUDOKU, 0, 0, 3
+      region.push new Cell MOCK_VALID_SUDOKU, 0, 1, 4
       region.sum().should.equal 7
 
   describe "contains", ->
 
-    cell1 = new Cell MOCK_VALID_SUDOKU, 0, 3
-    cell2 = new Cell MOCK_VALID_SUDOKU, 1, 3
-    cell3 = new Cell MOCK_VALID_SUDOKU, 2, 3
+    cell1 = new Cell MOCK_VALID_SUDOKU, 0, 0, 1
+    cell2 = new Cell MOCK_VALID_SUDOKU, 0, 1, 2
+    cell3 = new Cell MOCK_VALID_SUDOKU, 0, 1, 3
     region = new Region 'whatever'
     region.push cell1
     region.push cell2
@@ -208,5 +199,7 @@ describe "Region", ->
 
     xit "should complain if a non-contiguous cell is pushed", ->
       region = new Region 'whatever'
-      region.push(new Cell MOCK_VALID_SUDOKU, 0, 1)
-      ( -> region.push(new Cell MOCK_VALID_SUDOKU, 3, 1)).should.throw 'Non-contiguous cell pushed to region you bozo'
+      region.push new Cell MOCK_VALID_SUDOKU, 1, 1, 1
+      region.push new Cell MOCK_VALID_SUDOKU, 2, 1, 2
+      region.push new Cell MOCK_VALID_SUDOKU, 2, 0, 3
+      ( -> region.push new Cell MOCK_VALID_SUDOKU, 3, 3, 4).should.throw 'Non-contiguous cell (3,3) pushed to region you bozo'

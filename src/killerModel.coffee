@@ -19,13 +19,11 @@ class Sudoku
     for row in [0...@size]
       for col in [0...@size]
         index = (row * @size) + col
-        cell = new Cell this, index, values[index]
+        cell = new Cell this, row, col, values[index]
         @cells.push cell
-        boxRowIndex = Math.floor(row / @root)
-        boxColIndex = Math.floor(col / @root)
-        boxIndex = (boxRowIndex * @root) + boxColIndex
         @rows[row].push cell
         @cols[col].push cell
+        boxIndex = (Math.floor(row / @root) * @root) + Math.floor(col / @root)
         @boxes[boxIndex].push cell
 
   cellAt: (row, col) -> @cells[(row * @size) + col]
@@ -42,19 +40,17 @@ class CellBlock
 
 class Cell
 
-  constructor: (@sudoku, @index, @value) ->
-    @entries = []
+  constructor: (@sudoku, @row, @col, @value) -> @entries = []
 
-  row: -> Math.floor(@index / @sudoku.size)
+  isNextTo: (cell) ->
+    rowDiff = Math.abs(@row - cell.row)
+    colDiff = Math.abs(@col - cell.col)
+    (rowDiff is 1 and colDiff is 0) or (rowDiff is 0 and colDiff is 1)
 
-  col: -> @index % @sudoku.size
-
-  is_next_to: (cell) -> @col() is cell.col() or @row() is cell.row()
-
-  up:    -> @sudoku.cellAt @row() - 1, @col()
-  down:  -> @sudoku.cellAt @row() + 1, @col()
-  left:  -> @sudoku.cellAt @row(),     @col() - 1 unless @col() == 0
-  right: -> @sudoku.cellAt @row(),     @col() + 1 unless @col() >= (@sudoku.size - 1)
+  up:    -> @sudoku.cellAt @row - 1, @col
+  down:  -> @sudoku.cellAt @row + 1, @col
+  left:  -> @sudoku.cellAt @row,     @col - 1 unless @col == 0
+  right: -> @sudoku.cellAt @row,     @col + 1 unless @col >= (@sudoku.size - 1)
 
   enter: (value) ->
     if value in @entries
@@ -88,9 +84,14 @@ class Region
     @cells = []
 
   push: (cell) ->
-    previous = @cells[@cells.length - 1]
-#    throw new Error 'Bozo' if previous # and not previous.is_next_to cell
-    @cells.push cell
+    if @cells.length is 0
+      @cells.push cell
+    else
+      for existing in @cells
+        if existing.isNextTo(cell)
+          @cells.push cell
+          return
+#      throw new Error "Non-contiguous cell (#{cell.row},#{cell.col}) pushed to region you bozo"
 
   sum: () ->
     values = @cells.map (cell) -> cell.value
