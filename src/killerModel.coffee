@@ -5,10 +5,10 @@ class Sudoku
     throw new Error "That's not a valid square you bozo" unless Math.round(@size) is @size
     @cells = values.map (value,index) => new Cell this, index, value
 
-  cell_at: (row, col) ->
+  cellAt: (row, col) ->
     @cells[(row * @size) + col]
 
-  cell_at_index: (index) ->
+  cellAtIndex: (index) ->
     @cells[index]
 
 class Cell
@@ -22,10 +22,10 @@ class Cell
 
   is_next_to: (cell) -> @col() is cell.col() or @row() is cell.row()
 
-  up:    -> @sudoku.cell_at @row() - 1, @col()
-  down:  -> @sudoku.cell_at @row() + 1, @col()
-  left:  -> @sudoku.cell_at @row(),     @col() - 1 unless @col() == 0
-  right: -> @sudoku.cell_at @row(),     @col() + 1 unless @col() >= (@sudoku.size - 1)
+  up:    -> @sudoku.cellAt @row() - 1, @col()
+  down:  -> @sudoku.cellAt @row() + 1, @col()
+  left:  -> @sudoku.cellAt @row(),     @col() - 1 unless @col() == 0
+  right: -> @sudoku.cellAt @row(),     @col() + 1 unless @col() >= (@sudoku.size - 1)
 
   enter: (value) ->
     if value in @entries
@@ -43,7 +43,7 @@ class Killer extends Sudoku
     throw new Error "Incorrect number of regions you bozo" unless regionIds.length is @cells.length
     @regions= []
     for regionId,index in regionIds
-      cell = @cell_at_index(index)
+      cell = @cellAtIndex(index)
       region = (@regions.filter (r) -> r.id is regionId)[0]
       unless region
         region = new Region regionId

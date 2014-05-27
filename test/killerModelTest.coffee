@@ -24,24 +24,24 @@ describe 'Sudoku', ->
       7,8,9
     ]
 
-    describe 'cell_at', ->
+    describe 'cellAt', ->
 
       it 'should allow access by row and column (both zero-based for now)', ->
-        sudoku.cell_at(0,0).value.should.equal 1
-        sudoku.cell_at(1,0).value.should.equal 4
-        sudoku.cell_at(2,2).value.should.equal 9
+        sudoku.cellAt(0,0).value.should.equal 1
+        sudoku.cellAt(1,0).value.should.equal 4
+        sudoku.cellAt(2,2).value.should.equal 9
 
-    describe 'cell_at_index', ->
+    describe 'cellAtIndex', ->
 
       it 'should allow access by array index', ->
-        sudoku.cell_at_index(0).value.should.equal 1
-        sudoku.cell_at_index(3).value.should.equal 4
-        sudoku.cell_at_index(8).value.should.equal 9
+        sudoku.cellAtIndex(0).value.should.equal 1
+        sudoku.cellAtIndex(3).value.should.equal 4
+        sudoku.cellAtIndex(8).value.should.equal 9
 
     describe 'cell movement', ->
 
       move_and_expect_cell = (start_row, start_column, movement, end_row, end_column) ->
-        start_cell = sudoku.cell_at start_row, start_column
+        start_cell = sudoku.cellAt start_row, start_column
         end_cell = start_cell[movement]()
         end_cell.row().should.equal end_row
         end_cell.col().should.equal end_column
@@ -53,7 +53,7 @@ describe 'Sudoku', ->
         move_and_expect_cell 1, 1, 'right', 1, 2
 
       move_and_expect_undefined = (start_row, start_column, movement, end_row, end_column) ->
-        start_cell = sudoku.cell_at start_row,start_column
+        start_cell = sudoku.cellAt start_row,start_column
         end_cell = start_cell[movement]()
         (end_cell is undefined).should.be.true
 

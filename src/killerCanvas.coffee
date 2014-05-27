@@ -37,7 +37,7 @@ class KillerCanvas
     @model undefined
 
   model: (@killer) ->
-    @focusCell = @killer?.cell_at 0, 0
+    @focusCell = @killer?.cellAt 0, 0
     @redraw()
 
   redraw: () =>
@@ -60,7 +60,7 @@ class KillerCanvas
     w = h = @size / @killer.size
     for row in [0...@killer.size]
       for col in [0...@killer.size]
-        cell = @killer.cell_at row, col
+        cell = @killer.cellAt row, col
         cell.bounds = new Rectangle col * w, row * h, w, h
 
   _drawGridLines: (numberOfGridLines, strokeStyle, lineWidth) =>
@@ -91,7 +91,7 @@ class KillerCanvas
     @ctx.beginPath()
     for row in [0...@killer.size]
       for col in [0...@killer.size]
-        cell = @killer.cell_at row, col
+        cell = @killer.cellAt row, col
         rect = cell.bounds.innerRect @REGION_INSET
         x1 = rect.x
         y1 = rect.y
@@ -135,7 +135,7 @@ class KillerCanvas
     @ctx.textBaseline = 'middle'
     for row in [0...@killer.size]
       for col in [0...@killer.size]
-        cell = @killer.cell_at row, col
+        cell = @killer.cellAt row, col
         if cell.entries.length > 0
           @ctx.font = "#{fontSize(cell.entries.length)}px Arial"
           x = cell.bounds.middle().x - (@ctx.measureText(cell.entriesAsString()).width / 2)
@@ -150,7 +150,7 @@ class KillerCanvas
     y = evt.clientY - rect.top
     row = Math.floor (y * (@killer.size / @size))
     col = Math.floor (x * (@killer.size / @size))
-    cell = @killer.cell_at row, col
+    cell = @killer.cellAt row, col
     if cell isnt @focusCell
       @focusCell = cell
       @redraw()
