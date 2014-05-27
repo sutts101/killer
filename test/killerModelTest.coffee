@@ -3,42 +3,54 @@
 chai = require 'chai'
 chai.should()
 
-describe 'Sudoku', ->
+describe "Sudoku", ->
 
-  describe 'constructor', ->
+  A_VALID_4x4_GRID = [
+    1,2,3,4,
+    2,3,4,1,
+    3,4,1,2,
+    4,1,2,3
+  ]
 
-    it 'should like squares', ->
-      new Sudoku [1,2,3,4]
+  describe "constructor", ->
 
-    it 'should dislike non-squares', ->
-      ( -> new Sudoku [1,2,3] ).should.throw "That's not a valid square you bozo"
+    it "should like square squares", ->
+      new Sudoku [1]
+      new Sudoku A_VALID_4x4_GRID
 
-    it 'should compute its size as the square root of the number of cells', ->
-      new Sudoku([1,2,3,4]).size.should.equal 2
+    it "should dislike non-squares", ->
+      ( -> new Sudoku [1,2] ).should.throw "That's not a valid square you bozo"
 
-  describe 'grid', ->
+    it "should dislike non-square squares", ->
+      ( -> new Sudoku [1,2,3,4] ).should.throw "That's not a valid square square you bozo"
 
-    sudoku = new Sudoku [
-      1,2,3,
-      4,5,6,
-      7,8,9
-    ]
+    it "should compute its size as the square root of the number of cells", ->
+      new Sudoku([1]).size.should.equal 1
+      new Sudoku(A_VALID_4x4_GRID).size.should.equal 4
 
-    describe 'cellAt', ->
+    it "should compute its root as the square root of the size", ->
+      new Sudoku([1]).root.should.equal 1
+      new Sudoku(A_VALID_4x4_GRID).root.should.equal 2
 
-      it 'should allow access by row and column (both zero-based for now)', ->
+  describe "grid", ->
+
+    sudoku = new Sudoku A_VALID_4x4_GRID
+
+    describe "cellAt", ->
+
+      it "should allow access by row and column (both zero-based for now)", ->
         sudoku.cellAt(0,0).value.should.equal 1
-        sudoku.cellAt(1,0).value.should.equal 4
-        sudoku.cellAt(2,2).value.should.equal 9
+        sudoku.cellAt(1,0).value.should.equal 2
+        sudoku.cellAt(3,3).value.should.equal 3
 
-    describe 'cellAtIndex', ->
+    describe "cellAtIndex", ->
 
-      it 'should allow access by array index', ->
+      it "should allow access by array index", ->
         sudoku.cellAtIndex(0).value.should.equal 1
-        sudoku.cellAtIndex(3).value.should.equal 4
-        sudoku.cellAtIndex(8).value.should.equal 9
+        sudoku.cellAtIndex(5).value.should.equal 3
+        sudoku.cellAtIndex(9).value.should.equal 4
 
-    describe 'cell movement', ->
+    describe "cell movement", ->
 
       move_and_expect_cell = (start_row, start_column, movement, end_row, end_column) ->
         start_cell = sudoku.cellAt start_row, start_column
@@ -52,32 +64,32 @@ describe 'Sudoku', ->
         move_and_expect_cell 1, 1, 'left',  1, 0
         move_and_expect_cell 1, 1, 'right', 1, 2
 
-      move_and_expect_undefined = (start_row, start_column, movement, end_row, end_column) ->
+      move_and_expect_undefined = (start_row, start_column, movement) ->
         start_cell = sudoku.cellAt start_row,start_column
         end_cell = start_cell[movement]()
         (end_cell is undefined).should.be.true
 
       it "should not go up, down, left or right when it can't", ->
         move_and_expect_undefined 0, 1, 'up'
-        move_and_expect_undefined 2, 1, 'down'
+        move_and_expect_undefined 3, 1, 'down'
         move_and_expect_undefined 1, 0, 'left'
-        move_and_expect_undefined 1, 2, 'right'
+        move_and_expect_undefined 1, 3, 'right'
 
-describe 'Cell', ->
+describe "Cell", ->
 
-  it 'should know its row based on index and size of the sudoku grid', ->
+  it "should know its row based on index and size of the sudoku grid", ->
     new Cell( {size: 9},  0, 2).row().should.equal 0
     new Cell( {size: 9},  8, 2).row().should.equal 0
     new Cell( {size: 9},  9, 2).row().should.equal 1
     new Cell( {size: 9}, 19, 2).row().should.equal 2
 
-  it 'should know its column based on index and size of the sudoku grid', ->
+  it "should know its column based on index and size of the sudoku grid", ->
     new Cell( {size: 9},  0, 2).col().should.equal 0
     new Cell( {size: 9},  8, 2).col().should.equal 8
     new Cell( {size: 9},  9, 2).col().should.equal 0
     new Cell( {size: 9}, 19, 2).col().should.equal 1
 
-  it 'should recognise contiguous cells', ->
+  it "should recognise contiguous cells", ->
     cells = [1,2,3,4].map (value,index) -> new Cell({size: 2}, index, value)
     cells[0].is_next_to(cells[1]).should.equal true
     cells[0].is_next_to(cells[2]).should.equal true
@@ -86,7 +98,7 @@ describe 'Cell', ->
     cells[2].is_next_to(cells[0]).should.equal true
     cells[3].is_next_to(cells[0]).should.equal false
 
-  describe 'entries', ->
+  describe "entries", ->
 
     makeCell = () ->
       cell = new Cell( {size: 9},  0, 2)
@@ -112,20 +124,20 @@ describe 'Cell', ->
       cell.enter 1
       cell.entriesAsString().should.equal '2'
 
-describe 'Killer', ->
+describe "Killer", ->
 
-  describe 'constructor (unhappy path)', ->
+  describe "constructor (unhappy path)", ->
 
-    it 'should complain if regions array does not match values array', ->
-      ( -> new Killer [1,2,3,4], [1,2,3] ).should.throw "Incorrect number of regions you bozo"
+    it "should complain if length of regions array does not match that of values array", ->
+      ( -> new Killer [1], [1,2] ).should.throw "Incorrect number of regions you bozo"
 
-  describe 'constructor (happy path)', ->
+  describe "constructor (happy path)", ->
 
     values = [
+      4,1,2,3
+      3,4,1,2,
       1,2,3,4,
       2,3,4,1,
-      3,4,1,2,
-      4,1,2,3
     ]
 
     regions = [
@@ -137,20 +149,20 @@ describe 'Killer', ->
 
     killer = new Killer values, regions
 
-    it 'should create 8 regions', ->
+    it "should create 8 regions", ->
       killer.regions.length.should.equal 8
 
-    describe 'region (integration context)', ->
+    describe "region (integration context)", ->
 
-      it 'should sum the values of the contained cells', ->
-        killer.regions[0].sum().should.equal 3
-        killer.regions[1].sum().should.equal 7
+      it "should sum the values of the contained cells", ->
+        killer.regions[0].sum().should.equal 5
+        killer.regions[2].sum().should.equal 7
 
-describe 'Region', ->
+describe "Region", ->
 
-  describe 'sum', ->
+  describe "sum", ->
 
-    it 'should be the sum of the values of the contained cells', ->
+    it "should be the sum of the values of the contained cells", ->
       region = new Region('whatever')
       region.push(new Cell {size: 4}, 0, 3)
       region.push(new Cell {size: 9}, 1, 4)
@@ -171,9 +183,9 @@ describe 'Region', ->
       region.contains(cell3).should.be.false
 
 
-  describe 'well formed', ->
+  describe "well formed", ->
 
-    xit 'should complain if a non-contiguous cell is pushed', ->
-      region = new Region('whatever')
+    xit "should complain if a non-contiguous cell is pushed", ->
+      region = new Region 'whatever'
       region.push(new Cell {size: 9}, 0, 1)
       ( -> region.push(new Cell {size: 9}, 3, 1)).should.throw 'Non-contiguous cell pushed to region you bozo'

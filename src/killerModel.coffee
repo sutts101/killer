@@ -3,6 +3,8 @@ class Sudoku
   constructor: (values) ->
     @size = Math.sqrt(values.length)
     throw new Error "That's not a valid square you bozo" unless Math.round(@size) is @size
+    @root = Math.sqrt @size
+    throw new Error "That's not a valid square square you bozo" unless Math.round(@root) is @root
     @cells = values.map (value,index) => new Cell this, index, value
 
   cellAt: (row, col) ->
@@ -10,6 +12,16 @@ class Sudoku
 
   cellAtIndex: (index) ->
     @cells[index]
+
+
+#class CellBlock
+#
+#  constructor: -> @cells = []
+#
+#  values: -> @cells.map (cell) => cell.value
+#
+#  valuesAsString: @values().join ','
+
 
 class Cell
 
