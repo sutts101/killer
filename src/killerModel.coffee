@@ -7,6 +7,8 @@ class Sudoku
     @root = Math.sqrt @size
     throw new Error "That's not a valid square square you bozo" unless Math.round(@root) is @root
 
+    @validValues = [0...@size].map (value) => value + 1
+
     @cells = []
     @rows = []
     @cols = []
@@ -19,6 +21,7 @@ class Sudoku
     for row in [0...@size]
       for col in [0...@size]
         index = (row * @size) + col
+        throw new Error "Invalid value '#{values[index]}' at row #{row} column #{col}" unless values[index] in @validValues
         cell = new Cell this, row, col, values[index]
         @cells.push cell
         @rows[row].push cell
@@ -26,13 +29,16 @@ class Sudoku
         boxIndex = (Math.floor(row / @root) * @root) + Math.floor(col / @root)
         @boxes[boxIndex].push cell
 
+
   cellAt: (row, col) -> @cells[(row * @size) + col]
 
 class CellBlock
 
   constructor: -> @cells = []
 
-  push: (cell) -> @cells.push cell
+  push: (cell) ->
+#    throw new Error "Duplicate value '#{cell.value}' at row #{cell.row} column #{cell.col}" if cell.value in @values()
+    @cells.push cell
 
   values: -> @cells.map (cell) => cell.value
 
@@ -53,10 +59,11 @@ class Cell
   right: -> @sudoku.cellAt @row,     @col + 1 unless @col >= (@sudoku.size - 1)
 
   enter: (value) ->
-    if value in @entries
-      @entries = @entries.filter (e) -> e isnt value
-    else
-      @entries.push value
+    if value in @sudoku.validValues
+      if value in @entries
+        @entries = @entries.filter (e) -> e isnt value
+      else
+        @entries.push value
 
   entriesAsString: () ->
     @entries.join ''

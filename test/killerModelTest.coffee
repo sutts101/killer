@@ -45,6 +45,12 @@ describe "Sudoku", ->
       new Sudoku([1]).root.should.equal 1
       new Sudoku(A_VALID_4x4_GRID).root.should.equal 2
 
+    it "should generate a list of valid values", ->
+      sudoku = new Sudoku A_VALID_4x4_GRID
+      sudoku.validValues.join(',').should.equal '1,2,3,4'
+
+    it "should complain if any of the input values are not valid", ->
+      ( -> new Sudoku [2] ).should.throw "Invalid value '2' at row 0 column 0"
 
   describe "blocks", ->
 
@@ -67,10 +73,19 @@ describe "Sudoku", ->
       for expected,index in ['1,2,3,4', '3,4,1,2', '2,3,4,1', '4,1,2,3']
         sudoku.boxes[index].values().join(',').should.equal expected
 
-    it 'should do sums for all blocks and they should all be the same', ->
+    it "should do sums for all blocks and they should all be the same", ->
       for blockType in ['rows', 'cols', 'boxes']
         for index in [0..3]
           sudoku[blockType][index].sum().should.equal 10
+
+    xit "should complain if any of the blocks contain duplicates", ->
+      bad = [
+        1,2,3,4
+        2,3,4,1
+        3,4,1,2
+        4,1,2,3
+      ]
+      ( -> new Sudoku bad ).should.throw "Duplicate value '2' at row 1 column 0"
 
   describe "cell movement", ->
 
@@ -111,7 +126,8 @@ describe "Cell", ->
   describe "entries", ->
 
     makeCell = () ->
-      cell = new Cell {}, 0, 2
+      sudoku = new Sudoku A_VALID_4x4_GRID
+      cell = sudoku.cellAt 1, 1
 
     it "should start out empty", ->
       makeCell().entriesAsString().should.equal ''
@@ -133,6 +149,12 @@ describe "Cell", ->
       cell.enter 2
       cell.enter 1
       cell.entriesAsString().should.equal '2'
+
+    it "should just ignore invalid entries", ->
+      sudoku = new Sudoku A_VALID_4x4_GRID
+      cell = sudoku.cellAt 0, 0
+      cell.enter '5'
+      cell.entriesAsString().should.equal ''
 
 describe "Killer", ->
 
