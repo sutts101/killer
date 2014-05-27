@@ -9,31 +9,33 @@ class KillerCanvas
     @region_inset = 5
 
     @ctx = canvas.getContext "2d"
-    @_drawGridLines 9, 'black', 1
-    @_drawGridLines 3, 'black', 3
 
     @canvas.addEventListener 'mousemove', @_mouseMove
     window.addEventListener 'keydown', @_keyPress, false
     @canvas.addEventListener 'keydown', @_keyPress, true
 
     @focusCell = null
+    @redraw()
 
   model: (@killer) ->
-    @sudoku = @killer.sudoku
-    @focusCell = @sudoku.cell_at 0, 0
+    @focusCell = @killer?.cell_at 0, 0
     @redraw()
 
   redraw: () =>
-    console.log "redrawing..."
     @ctx.setLineDash [1000]
     @ctx.fillStyle = "#EEEEEE"
     @ctx.fillRect 0, 0, @size, @size
-    @_drawGridLines @sudoku.size, 'black', 1
-    @_drawGridLines Math.sqrt(@sudoku.size), 'black', 3
-    @_drawRegions()
-    @_drawRegionSums()
-    @_drawFocus()
-    @_drawEntries()
+    if @killer?
+      @_drawGridLines @killer.size, 'black', 1
+      @_drawGridLines Math.sqrt(@killer.size), 'black', 3
+      @_drawRegions()
+      @_drawRegionSums()
+      @_drawFocus()
+      @_drawEntries()
+    else
+      @_drawGridLines 9, 'black', 1
+      @_drawGridLines 3, 'black', 3
+
 
   _drawGridLines: (numberOfGridLines, strokeStyle, lineWidth) =>
     @ctx.strokeStyle = strokeStyle
@@ -53,13 +55,13 @@ class KillerCanvas
     @ctx.setLineDash [1]
     @ctx.lineWidth = 1
     @ctx.beginPath()
-    for row in [0...@sudoku.size]
-      for col in [0...@sudoku.size]
-        cell = @sudoku.cell_at row, col
-        x1 = ((col + 0) * (@size / @sudoku.size)) + @region_inset
-        y1 = ((row + 0) * (@size / @sudoku.size)) + @region_inset
-        x2 = ((col + 1) * (@size / @sudoku.size)) - @region_inset
-        y2 = ((row + 1) * (@size / @sudoku.size)) - @region_inset
+    for row in [0...@killer.size]
+      for col in [0...@killer.size]
+        cell = @killer.cell_at row, col
+        x1 = ((col + 0) * (@size / @killer.size)) + @region_inset
+        y1 = ((row + 0) * (@size / @killer.size)) + @region_inset
+        x2 = ((col + 1) * (@size / @killer.size)) - @region_inset
+        y2 = ((row + 1) * (@size / @killer.size)) - @region_inset
         line = (x1, y1, x2, y2) =>
           @ctx.moveTo x1, y1
           @ctx.lineTo x2, y2
@@ -85,25 +87,25 @@ class KillerCanvas
     @ctx.textBaseline = 'top'
     for region in @killer.regions
       cell = region.cells[0]
-      x = (cell.col() * (@size / @sudoku.size)) + @region_inset + 3
-      y = (cell.row() * (@size / @sudoku.size)) + @region_inset + 3
+      x = (cell.col() * (@size / @killer.size)) + @region_inset + 3
+      y = (cell.row() * (@size / @killer.size)) + @region_inset + 3
       @ctx.fillText(cell.region.sum(), x, y);
 
   _drawFocus: () ->
     if @focusCell?
-      x1 = ((@focusCell.col() + 0) * (@size / @sudoku.size)) + (3 * @region_inset)
-      y1 = ((@focusCell.row() + 0) * (@size / @sudoku.size)) + (3 * @region_inset)
-      x2 = ((@focusCell.col() + 1) * (@size / @sudoku.size)) - (3 * @region_inset)
-      y2 = ((@focusCell.row() + 1) * (@size / @sudoku.size)) - (3 * @region_inset)
+      x1 = ((@focusCell.col() + 0) * (@size / @killer.size)) + (3 * @region_inset)
+      y1 = ((@focusCell.row() + 0) * (@size / @killer.size)) + (3 * @region_inset)
+      x2 = ((@focusCell.col() + 1) * (@size / @killer.size)) - (3 * @region_inset)
+      y2 = ((@focusCell.row() + 1) * (@size / @killer.size)) - (3 * @region_inset)
       @ctx.fillStyle = "yellow"
       @ctx.fillRect x1, y1, x2-x1, y2-y1
 
   _drawEntries: () ->
     @ctx.fillStyle = "darkblue"
     @ctx.textBaseline = 'middle'
-    for row in [0...@sudoku.size]
-      for col in [0...@sudoku.size]
-        cell = @sudoku.cell_at row, col
+    for row in [0...@killer.size]
+      for col in [0...@killer.size]
+        cell = @killer.cell_at row, col
         if cell.entries.length > 0
           if cell.entries.length is 1
             @ctx.font = "30px Arial"
@@ -111,18 +113,19 @@ class KillerCanvas
             @ctx.font = "10px Arial"
           else
             @ctx.font = "15px Arial"
-          x = (col + 0.5) * (@size / @sudoku.size) - (@ctx.measureText(cell.entriesAsString()).width / 2)
-          y = (row + 0.5) * (@size / @sudoku.size)
+          x = (col + 0.5) * (@size / @killer.size) - (@ctx.measureText(cell.entriesAsString()).width / 2)
+          y = (row + 0.5) * (@size / @killer.size)
           @ctx.fillText(cell.entriesAsString(), x, y);
 
 
   _mouseMove: (evt) =>
+    return false unless @killer?
     rect = @canvas.getBoundingClientRect()
     x = evt.clientX - rect.left
     y = evt.clientY - rect.top
-    row = Math.floor (y * (@sudoku.size / @size))
-    col = Math.floor (x * (@sudoku.size / @size))
-    cell = @sudoku.cell_at row, col
+    row = Math.floor (y * (@killer.size / @size))
+    col = Math.floor (x * (@killer.size / @size))
+    cell = @killer.cell_at row, col
     if cell isnt @focusCell
       @focusCell = cell
       @redraw()

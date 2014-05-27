@@ -36,13 +36,14 @@ class Cell
   entriesAsString: () ->
     @entries.join ''
 
-class Killer
+class Killer extends Sudoku
 
-  constructor: (@sudoku, regionIds) ->
-    throw new Error "Incorrect number of regions you bozo" unless regionIds.length is @sudoku.cells.length
+  constructor: (values, regionIds) ->
+    super values
+    throw new Error "Incorrect number of regions you bozo" unless regionIds.length is @cells.length
     @regions= []
     for regionId,index in regionIds
-      cell = @sudoku.cell_at_index(index)
+      cell = @cell_at_index(index)
       region = (@regions.filter (r) -> r.id is regionId)[0]
       unless region
         region = new Region regionId

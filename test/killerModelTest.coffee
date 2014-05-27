@@ -117,23 +117,25 @@ describe 'Killer', ->
   describe 'constructor (unhappy path)', ->
 
     it 'should complain if regions array does not match values array', ->
-      ( -> new Killer new Sudoku([1,2,3,4]), [1,2,3] ).should.throw "Incorrect number of regions you bozo"
+      ( -> new Killer [1,2,3,4], [1,2,3] ).should.throw "Incorrect number of regions you bozo"
 
   describe 'constructor (happy path)', ->
 
-    sudoku = new Sudoku [
+    values = [
       1,2,3,4,
       2,3,4,1,
       3,4,1,2,
       4,1,2,3
     ]
 
-    killer = new Killer sudoku, [
+    regions = [
       1,1,2,2,
       3,3,4,4,
       5,5,6,6,
       7,7,8,8
     ]
+
+    killer = new Killer values, regions
 
     it 'should create 8 regions', ->
       killer.regions.length.should.equal 8

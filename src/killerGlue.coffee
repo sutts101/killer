@@ -1,14 +1,10 @@
-#{Sudoku, Cell, Killer, Region} = require 'killerModel'
+#{Killer} = require 'killerModel'
 #{KillerCanvas} = require 'killerCanvas'
 
 
 $(document).ready ->
 
-  Sudoku = window.Sudoku
-  Killer = window.Killer
-  KillerCanvas = window.KillerCanvas
-
-  sudoku = new Sudoku [
+  values = [
 
     1,2,3,  4,5,6,  7,8,9
     4,5,6,  7,8,9,  1,2,3
@@ -24,7 +20,7 @@ $(document).ready ->
 
   ]
 
-  killer = new Killer sudoku, [
+  regions = [
 
     1, 1, 2,    2, 3, 4,    4, 5, 5
     1, 6, 6,    3, 3, 3,    8, 8, 5
@@ -40,7 +36,9 @@ $(document).ready ->
 
   ]
 
-  killerCanvas = new KillerCanvas document.getElementById "killer"
-  killerCanvas.model killer
+  Killer = window.Killer
+  KillerCanvas = window.KillerCanvas
 
-
+  killer = new Killer values, regions
+  canvas = new KillerCanvas document.getElementById('killer')
+  canvas.model killer
