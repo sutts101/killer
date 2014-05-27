@@ -32,70 +32,64 @@ describe "Sudoku", ->
       new Sudoku([1]).root.should.equal 1
       new Sudoku(A_VALID_4x4_GRID).root.should.equal 2
 
-  describe "grid", ->
+    it "should allow access to cells by row and column", ->
+      sudoku = new Sudoku A_VALID_4x4_GRID
+      sudoku.cellAt(0,0).value.should.equal 1
+      sudoku.cellAt(1,0).value.should.equal 2
+      sudoku.cellAt(3,3).value.should.equal 3
+
+  describe "cell movement", ->
 
     sudoku = new Sudoku A_VALID_4x4_GRID
 
-    describe "cellAt", ->
+    move_and_expect_cell = (start_row, start_column, movement, end_row, end_column) ->
+      start_cell = sudoku.cellAt start_row, start_column
+      end_cell = start_cell[movement]()
+      end_cell.row().should.equal end_row
+      end_cell.col().should.equal end_column
 
-      it "should allow access by row and column (both zero-based for now)", ->
-        sudoku.cellAt(0,0).value.should.equal 1
-        sudoku.cellAt(1,0).value.should.equal 2
-        sudoku.cellAt(3,3).value.should.equal 3
+    it "should go up, down, left and right when it can", ->
+      move_and_expect_cell 1, 1, 'up',    0, 1
+      move_and_expect_cell 1, 1, 'down',  2, 1
+      move_and_expect_cell 1, 1, 'left',  1, 0
+      move_and_expect_cell 1, 1, 'right', 1, 2
 
-    describe "cellAtIndex", ->
+    move_and_expect_undefined = (start_row, start_column, movement) ->
+      start_cell = sudoku.cellAt start_row,start_column
+      end_cell = start_cell[movement]()
+      (end_cell is undefined).should.be.true
 
-      it "should allow access by array index", ->
-        sudoku.cellAtIndex(0).value.should.equal 1
-        sudoku.cellAtIndex(5).value.should.equal 3
-        sudoku.cellAtIndex(9).value.should.equal 4
-
-    describe "cell movement", ->
-
-      move_and_expect_cell = (start_row, start_column, movement, end_row, end_column) ->
-        start_cell = sudoku.cellAt start_row, start_column
-        end_cell = start_cell[movement]()
-        end_cell.row().should.equal end_row
-        end_cell.col().should.equal end_column
-
-      it "should go up, down, left and right when it can", ->
-        move_and_expect_cell 1, 1, 'up',    0, 1
-        move_and_expect_cell 1, 1, 'down',  2, 1
-        move_and_expect_cell 1, 1, 'left',  1, 0
-        move_and_expect_cell 1, 1, 'right', 1, 2
-
-      move_and_expect_undefined = (start_row, start_column, movement) ->
-        start_cell = sudoku.cellAt start_row,start_column
-        end_cell = start_cell[movement]()
-        (end_cell is undefined).should.be.true
-
-      it "should not go up, down, left or right when it can't", ->
-        move_and_expect_undefined 0, 1, 'up'
-        move_and_expect_undefined 3, 1, 'down'
-        move_and_expect_undefined 1, 0, 'left'
-        move_and_expect_undefined 1, 3, 'right'
+    it "should not go up, down, left or right when it can't", ->
+      move_and_expect_undefined 0, 1, 'up'
+      move_and_expect_undefined 3, 1, 'down'
+      move_and_expect_undefined 1, 0, 'left'
+      move_and_expect_undefined 1, 3, 'right'
 
   describe "blocks", ->
 
     sudoku = new Sudoku [
       1,2,3,4,
-      2,3,4,1,
       3,4,1,2,
+      2,3,4,1,
       4,1,2,3
     ]
 
     it "should do rows", ->
-      sudoku.rowAt(0).valuesAsString().should.equal '1,2,3,4'
-      sudoku.rowAt(2).valuesAsString().should.equal '3,4,1,2'
+      for expected,index in ['1,2,3,4', '3,4,1,2', '2,3,4,1', '4,1,2,3']
+        sudoku.rows[index].values().join(',').should.equal expected
 
     it "should do columns", ->
-      sudoku.columnAt(0).valuesAsString().should.equal '1,2,3,4'
-      sudoku.columnAt(3).valuesAsString().should.equal '4,1,2,3'
+      for expected,index in ['1,3,2,4', '2,4,3,1', '3,1,4,2', '4,2,1,3']
+        sudoku.cols[index].values().join(',').should.equal expected
+
+    it "should do boxes", ->
+      for expected,index in ['1,2,3,4', '3,4,1,2', '2,3,4,1', '4,1,2,3']
+        sudoku.boxes[index].values().join(',').should.equal expected
 
     it 'should do sums for all blocks and they should all be the same', ->
-      for index in [0..3]
-        sudoku.rowAt(index).sum().should.equal 10
-        sudoku.columnAt(index).sum().should.equal 10
+      for blockType in ['rows', 'cols', 'boxes']
+        for index in [0..3]
+          sudoku[blockType][index].sum().should.equal 10
 
 
 describe "Cell", ->

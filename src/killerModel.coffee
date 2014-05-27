@@ -10,26 +10,25 @@ class Sudoku
     @cells = []
     @rows = []
     @cols = []
+    @boxes = []
 
-    for index in [0...@size]
-      @rows.push new CellBlock
-      @cols.push new CellBlock
+    for blockType in ['rows', 'cols', 'boxes']
+      for index in [0...@size]
+        @[blockType].push new CellBlock
 
     for row in [0...@size]
       for col in [0...@size]
         index = (row * @size) + col
         cell = new Cell this, index, values[index]
         @cells.push cell
-        @rowAt(row).push cell
-        @columnAt(col).push cell
+        boxRowIndex = Math.floor(row / @root)
+        boxColIndex = Math.floor(col / @root)
+        boxIndex = (boxRowIndex * @root) + boxColIndex
+        @rows[row].push cell
+        @cols[col].push cell
+        @boxes[boxIndex].push cell
 
   cellAt: (row, col) -> @cells[(row * @size) + col]
-
-  cellAtIndex: (index) -> @cells[index]
-
-  rowAt: (rowIndex) -> @rows[rowIndex]
-
-  columnAt: (colIndex) -> @cols[colIndex]
 
 class CellBlock
 
@@ -40,8 +39,6 @@ class CellBlock
   values: -> @cells.map (cell) => cell.value
 
   sum: -> @values().reduce (x,y) -> x + y
-
-  valuesAsString: -> @values().join ','
 
 class Cell
 
@@ -75,7 +72,9 @@ class Killer extends Sudoku
     throw new Error "Incorrect number of regions you bozo" unless regionIds.length is @cells.length
     @regions= []
     for regionId,index in regionIds
-      cell = @cellAtIndex(index)
+      row = Math.floor(index / @size)
+      col = index % @size
+      cell = @cellAt row, col
       region = (@regions.filter (r) -> r.id is regionId)[0]
       unless region
         region = new Region regionId
