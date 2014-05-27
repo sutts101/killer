@@ -75,6 +75,29 @@ describe "Sudoku", ->
         move_and_expect_undefined 1, 0, 'left'
         move_and_expect_undefined 1, 3, 'right'
 
+  describe "blocks", ->
+
+    sudoku = new Sudoku [
+      1,2,3,4,
+      2,3,4,1,
+      3,4,1,2,
+      4,1,2,3
+    ]
+
+    it "should do rows", ->
+      sudoku.rowAt(0).valuesAsString().should.equal '1,2,3,4'
+      sudoku.rowAt(2).valuesAsString().should.equal '3,4,1,2'
+
+    it "should do columns", ->
+      sudoku.columnAt(0).valuesAsString().should.equal '1,2,3,4'
+      sudoku.columnAt(3).valuesAsString().should.equal '4,1,2,3'
+
+    it 'should do sums for all blocks and they should all be the same', ->
+      for index in [0..3]
+        sudoku.rowAt(index).sum().should.equal 10
+        sudoku.columnAt(index).sum().should.equal 10
+
+
 describe "Cell", ->
 
   MOCK_4x4_SUDOKU = {size: 4, root: 2}

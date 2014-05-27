@@ -1,28 +1,48 @@
 class Sudoku
 
   constructor: (values) ->
+
     @size = Math.sqrt(values.length)
     throw new Error "That's not a valid square you bozo" unless Math.round(@size) is @size
     @root = Math.sqrt @size
     throw new Error "That's not a valid square square you bozo" unless Math.round(@root) is @root
-    @cells = values.map (value,index) => new Cell this, index, value
 
-  cellAt: (row, col) ->
-    @cells[(row * @size) + col]
+    @cells = []
+    @rows = []
+    @cols = []
 
-  cellAtIndex: (index) ->
-    @cells[index]
+    for index in [0...@size]
+      @rows.push new CellBlock
+      @cols.push new CellBlock
 
+    for row in [0...@size]
+      for col in [0...@size]
+        index = (row * @size) + col
+        cell = new Cell this, index, values[index]
+        @cells.push cell
+        @rowAt(row).push cell
+        @columnAt(col).push cell
 
-#class CellBlock
-#
-#  constructor: -> @cells = []
-#
-#  values: -> @cells.map (cell) => cell.value
-#
-#  valuesAsString: @values().join ','
-#
-#
+  cellAt: (row, col) -> @cells[(row * @size) + col]
+
+  cellAtIndex: (index) -> @cells[index]
+
+  rowAt: (rowIndex) -> @rows[rowIndex]
+
+  columnAt: (colIndex) -> @cols[colIndex]
+
+class CellBlock
+
+  constructor: -> @cells = []
+
+  push: (cell) -> @cells.push cell
+
+  values: -> @cells.map (cell) => cell.value
+
+  sum: -> @values().reduce (x,y) -> x + y
+
+  valuesAsString: -> @values().join ','
+
 class Cell
 
   constructor: (@sudoku, @index, @value) ->
