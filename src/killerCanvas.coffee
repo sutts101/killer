@@ -1,12 +1,32 @@
 #{Sudoku, Cell, Killer, Region} = require 'killerModel'
 
+class Rectangle
+
+  constructor: (@x, @y, @w, @h) ->
+
+  toString: -> "{ x: #{@x}, y: #{@y}, w: #{@w}, h:#{@h} }"
+
+  innerRect: (inset) -> new Rectangle @x + inset, @y + inset, @w - (2 * inset), @h - (2 * inset)
+
+  middle: ->
+      x: @x + (@w / 2)
+      y: @y + (@h / 2)
+
+
 class KillerCanvas
+
+  MAJOR_GRID_LINE:      3
+  MINOR_GRID_LINE:      1
+  REGION_INSET:         5
+  REGION_SUM_INSET:     3
+  COLOR_FOR_GRID_LINES: 'black'
+  COLOR_FOR_REGIONS:    'green'
+  COLOR_FOR_FOCUS:      'yellow'
+  COLOR_FOR_ENTRIES:    'darkblue'
 
   constructor: (@canvas) ->
     @size = @canvas.width
     console.log "The canvas ain't square you bozo - this won't render very well" unless canvas.width is canvas.height
-
-    @region_inset = 5
 
     @ctx = canvas.getContext "2d"
 
@@ -14,8 +34,7 @@ class KillerCanvas
     window.addEventListener 'keydown', @_keyPress, false
     @canvas.addEventListener 'keydown', @_keyPress, true
 
-    @focusCell = null
-    @redraw()
+    @model undefined
 
   model: (@killer) ->
     @focusCell = @killer?.cell_at 0, 0
@@ -25,17 +44,24 @@ class KillerCanvas
     @ctx.setLineDash [1000]
     @ctx.fillStyle = "#EEEEEE"
     @ctx.fillRect 0, 0, @size, @size
-    if @killer?
-      @_drawGridLines @killer.size, 'black', 1
-      @_drawGridLines Math.sqrt(@killer.size), 'black', 3
+    if not @killer?
+      @_drawGridLines 9, @COLOR_FOR_GRID_LINES, @MINOR_GRID_LINE
+      @_drawGridLines 3, @COLOR_FOR_GRID_LINES, @MAJOR_GRID_LINE
+    else
+      @_drawGridLines @killer.size, @COLOR_FOR_GRID_LINES, @MINOR_GRID_LINE
+      @_drawGridLines Math.sqrt(@killer.size), @COLOR_FOR_GRID_LINES, @MAJOR_GRID_LINE
+      @_assignCellBounds()
       @_drawRegions()
       @_drawRegionSums()
       @_drawFocus()
       @_drawEntries()
-    else
-      @_drawGridLines 9, 'black', 1
-      @_drawGridLines 3, 'black', 3
 
+  _assignCellBounds: ->
+    w = h = @size / @killer.size
+    for row in [0...@killer.size]
+      for col in [0...@killer.size]
+        cell = @killer.cell_at row, col
+        cell.bounds = new Rectangle col * w, row * h, w, h
 
   _drawGridLines: (numberOfGridLines, strokeStyle, lineWidth) =>
     @ctx.strokeStyle = strokeStyle
@@ -51,6 +77,14 @@ class KillerCanvas
     @ctx.closePath()
 
   _drawRegions: ->
+    line = (x1, y1, x2, y2) =>
+      @ctx.moveTo x1, y1
+      @ctx.lineTo x2, y2
+    more = (cell, movement) =>
+      if cell.region.contains cell[movement]()
+        (2 * @REGION_INSET)
+      else
+        0
     @ctx.strokeStyle = 'green'
     @ctx.setLineDash [1]
     @ctx.lineWidth = 1
@@ -58,18 +92,11 @@ class KillerCanvas
     for row in [0...@killer.size]
       for col in [0...@killer.size]
         cell = @killer.cell_at row, col
-        x1 = ((col + 0) * (@size / @killer.size)) + @region_inset
-        y1 = ((row + 0) * (@size / @killer.size)) + @region_inset
-        x2 = ((col + 1) * (@size / @killer.size)) - @region_inset
-        y2 = ((row + 1) * (@size / @killer.size)) - @region_inset
-        line = (x1, y1, x2, y2) =>
-          @ctx.moveTo x1, y1
-          @ctx.lineTo x2, y2
-        more = (cell, movement) =>
-          if cell.region.contains cell[movement]()
-            (2 * @region_inset)
-          else
-            0
+        rect = cell.bounds.innerRect @REGION_INSET
+        x1 = rect.x
+        y1 = rect.y
+        x2 = rect.x + rect.w
+        y2 = rect.y + rect.h
         unless cell.region.contains cell.up()
           line x1 - more(cell, 'left'), y1, x2 + more(cell, 'right'), y1
         unless cell.region.contains cell.right()
@@ -82,40 +109,38 @@ class KillerCanvas
     @ctx.closePath()
 
   _drawRegionSums: () ->
-    @ctx.fillStyle = "green"
-    @ctx.font = "12px Arial"
+    @ctx.fillStyle = @COLOR_FOR_REGIONS
+    @ctx.font = "11px Arial"
     @ctx.textBaseline = 'top'
     for region in @killer.regions
       cell = region.cells[0]
-      x = (cell.col() * (@size / @killer.size)) + @region_inset + 3
-      y = (cell.row() * (@size / @killer.size)) + @region_inset + 3
-      @ctx.fillText(cell.region.sum(), x, y);
+      rect = cell.bounds.innerRect @REGION_INSET + @REGION_SUM_INSET
+      @ctx.fillText cell.region.sum(), rect.x, rect.y
 
   _drawFocus: () ->
     if @focusCell?
-      x1 = ((@focusCell.col() + 0) * (@size / @killer.size)) + (3 * @region_inset)
-      y1 = ((@focusCell.row() + 0) * (@size / @killer.size)) + (3 * @region_inset)
-      x2 = ((@focusCell.col() + 1) * (@size / @killer.size)) - (3 * @region_inset)
-      y2 = ((@focusCell.row() + 1) * (@size / @killer.size)) - (3 * @region_inset)
-      @ctx.fillStyle = "yellow"
-      @ctx.fillRect x1, y1, x2-x1, y2-y1
+      rect = @focusCell.bounds.innerRect 3 * @REGION_INSET
+      @ctx.fillStyle = @COLOR_FOR_FOCUS
+      @ctx.fillRect rect.x, rect.y, rect.w, rect.h
 
   _drawEntries: () ->
-    @ctx.fillStyle = "darkblue"
+    fontSize = (numEntries) =>
+      if numEntries is 1
+        30
+      else if numEntries < 5
+        15
+      else
+        10
+    @ctx.fillStyle = @COLOR_FOR_ENTRIES
     @ctx.textBaseline = 'middle'
     for row in [0...@killer.size]
       for col in [0...@killer.size]
         cell = @killer.cell_at row, col
         if cell.entries.length > 0
-          if cell.entries.length is 1
-            @ctx.font = "30px Arial"
-          else if cell.entries.length > 4
-            @ctx.font = "10px Arial"
-          else
-            @ctx.font = "15px Arial"
-          x = (col + 0.5) * (@size / @killer.size) - (@ctx.measureText(cell.entriesAsString()).width / 2)
-          y = (row + 0.5) * (@size / @killer.size)
-          @ctx.fillText(cell.entriesAsString(), x, y);
+          @ctx.font = "#{fontSize(cell.entries.length)}px Arial"
+          x = cell.bounds.middle().x - (@ctx.measureText(cell.entriesAsString()).width / 2)
+          y = cell.bounds.middle().y
+          @ctx.fillText cell.entriesAsString(), x, y
 
 
   _mouseMove: (evt) =>
@@ -141,9 +166,11 @@ class KillerCanvas
         if @focusCell[movement]()?
           @focusCell = @focusCell[movement]()
           @redraw()
-      else if evt.keyCode = 67
+      else if evt.keyCode is 67
         @focusCell.entries.length = 0
         @redraw()
+      else
+        false
 
 
 root = exports ? window
