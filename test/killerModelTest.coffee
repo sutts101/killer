@@ -77,17 +77,19 @@ describe "Sudoku", ->
 
 describe "Cell", ->
 
+  MOCK_4x4_SUDOKU = {size: 4, root: 2}
+
   it "should know its row based on index and size of the sudoku grid", ->
-    new Cell( {size: 9},  0, 2).row().should.equal 0
-    new Cell( {size: 9},  8, 2).row().should.equal 0
-    new Cell( {size: 9},  9, 2).row().should.equal 1
-    new Cell( {size: 9}, 19, 2).row().should.equal 2
+    new Cell( MOCK_4x4_SUDOKU,  0, 2).row().should.equal 0
+    new Cell( MOCK_4x4_SUDOKU,  3, 2).row().should.equal 0
+    new Cell( MOCK_4x4_SUDOKU,  4, 2).row().should.equal 1
+    new Cell( MOCK_4x4_SUDOKU, 15, 2).row().should.equal 3
 
   it "should know its column based on index and size of the sudoku grid", ->
-    new Cell( {size: 9},  0, 2).col().should.equal 0
-    new Cell( {size: 9},  8, 2).col().should.equal 8
-    new Cell( {size: 9},  9, 2).col().should.equal 0
-    new Cell( {size: 9}, 19, 2).col().should.equal 1
+    new Cell( MOCK_4x4_SUDOKU,  0, 2).col().should.equal 0
+    new Cell( MOCK_4x4_SUDOKU,  1, 2).col().should.equal 1
+    new Cell( MOCK_4x4_SUDOKU,  5, 2).col().should.equal 1
+    new Cell( MOCK_4x4_SUDOKU, 15, 2).col().should.equal 3
 
   it "should recognise contiguous cells", ->
     cells = [1,2,3,4].map (value,index) -> new Cell({size: 2}, index, value)
@@ -101,7 +103,7 @@ describe "Cell", ->
   describe "entries", ->
 
     makeCell = () ->
-      cell = new Cell( {size: 9},  0, 2)
+      cell = new Cell( MOCK_4x4_SUDOKU, 0, 2)
 
     it "should start out empty", ->
       makeCell().entriesAsString().should.equal ''
@@ -160,19 +162,21 @@ describe "Killer", ->
 
 describe "Region", ->
 
+  MOCK_VALID_SUDOKU = {size: 4, root: 2}
+
   describe "sum", ->
 
     it "should be the sum of the values of the contained cells", ->
       region = new Region('whatever')
-      region.push(new Cell {size: 4}, 0, 3)
-      region.push(new Cell {size: 9}, 1, 4)
+      region.push(new Cell MOCK_VALID_SUDOKU, 0, 3)
+      region.push(new Cell MOCK_VALID_SUDOKU, 1, 4)
       region.sum().should.equal 7
 
   describe "contains", ->
 
-    cell1 = new Cell {size: 4}, 0, 3
-    cell2 = new Cell {size: 4}, 1, 3
-    cell3 = new Cell {size: 4}, 2, 3
+    cell1 = new Cell MOCK_VALID_SUDOKU, 0, 3
+    cell2 = new Cell MOCK_VALID_SUDOKU, 1, 3
+    cell3 = new Cell MOCK_VALID_SUDOKU, 2, 3
     region = new Region 'whatever'
     region.push cell1
     region.push cell2
@@ -187,5 +191,5 @@ describe "Region", ->
 
     xit "should complain if a non-contiguous cell is pushed", ->
       region = new Region 'whatever'
-      region.push(new Cell {size: 9}, 0, 1)
-      ( -> region.push(new Cell {size: 9}, 3, 1)).should.throw 'Non-contiguous cell pushed to region you bozo'
+      region.push(new Cell MOCK_VALID_SUDOKU, 0, 1)
+      ( -> region.push(new Cell MOCK_VALID_SUDOKU, 3, 1)).should.throw 'Non-contiguous cell pushed to region you bozo'

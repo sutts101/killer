@@ -21,8 +21,8 @@ class Sudoku
 #  values: -> @cells.map (cell) => cell.value
 #
 #  valuesAsString: @values().join ','
-
-
+#
+#
 class Cell
 
   constructor: (@sudoku, @index, @value) ->
