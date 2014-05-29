@@ -21,7 +21,7 @@ class Sudoku
     for row in [0...@size]
       for col in [0...@size]
         index = (row * @size) + col
-        throw new Error "Invalid value '#{values[index]}' at row #{row} column #{col}" unless values[index] in @validValues
+        throw new Error "Invalid value '#{values[index]}' at row #{row} column #{col}" unless values[index] in @validValues or values[index] is null
         cell = new Cell this, row, col, values[index]
         @cells.push cell
         @rows[row].push cell
@@ -37,7 +37,7 @@ class CellBlock
   constructor: -> @cells = []
 
   push: (cell) ->
-    throw new Error "Duplicate value '#{cell.value}' at row #{cell.row} column #{cell.col}" if cell.value in @values()
+    throw new Error "Duplicate value '#{cell.value}' at row #{cell.row} column #{cell.col}" if cell.value in @values() and cell.value isnt null
     @cells.push cell
 
   values: -> @cells.map (cell) => cell.value

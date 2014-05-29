@@ -275,3 +275,12 @@ describe "9x9 grids", ->
     killer.validValues.join('').should.equal '123456789'
     killer.regions[0].sum().should.equal 7
 
+
+describe "nulls", ->
+
+  it "should allow nulls so that we can play with it", ->
+
+    incompleteModel = [1,2,3,4]
+    incompleteModel.push null for index in [incompleteModel.length..15]
+
+    sudoku = new Sudoku incompleteModel
