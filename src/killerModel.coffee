@@ -87,20 +87,25 @@ class Killer extends Sudoku
       region.push cell
       cell.region = region
 
+    for region in @regions
+      region.validate()
+
 class Region
 
   constructor: (@id) ->
     @cells = []
 
-  push: (cell) ->
-    if @cells.length is 0
-      @cells.push cell
-    else
-      for existing in @cells
-        if existing.isNextTo(cell)
-          @cells.push cell
-          return
-      throw new Error "Non-contiguous cell (#{cell.row},#{cell.col}) pushed to region you bozo"
+  push: (cell) -> @cells.push cell
+
+  validate: ->
+    throw new Error "Huh, empty region - how did that happen???" if @cells.length is 0
+    if @cells.length > 1
+      hasAtLeastOneNeighbour = (cell) =>
+        for other in @cells
+          return true if other isnt cell and other.isNextTo cell
+        false
+      for cell in @cells
+        throw new Error "Non-contiguous cell (#{cell.row},#{cell.col}) pushed to region you bozo" unless hasAtLeastOneNeighbour cell
 
   sum: () ->
     values = @cells.map (cell) -> cell.value

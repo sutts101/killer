@@ -53,6 +53,7 @@ describe "Sudoku", ->
       new Sudoku [1]
       ( -> new Sudoku [2] ).should.throw "Invalid value '2' at row 0 column 0"
 
+
   describe "blocks", ->
 
     sudoku = new Sudoku [
@@ -115,47 +116,47 @@ describe "Sudoku", ->
       move_and_expect_undefined 1, 0, 'left'
       move_and_expect_undefined 1, 3, 'right'
 
-describe "Cell", ->
+  describe "cells", ->
 
-  it "should recognise contiguous cells", ->
-    sudoku = new Sudoku A_VALID_4x4_GRID
-    sudoku.cellAt(0,0).isNextTo(sudoku.cellAt(0,1)).should.equal true
-    sudoku.cellAt(0,0).isNextTo(sudoku.cellAt(1,0)).should.equal true
-    sudoku.cellAt(0,0).isNextTo(sudoku.cellAt(1,1)).should.equal false
-    sudoku.cellAt(0,0).isNextTo(sudoku.cellAt(0,2)).should.equal false
-
-  describe "entries", ->
-
-    makeCell = () ->
+    it "should recognise contiguous cells", ->
       sudoku = new Sudoku A_VALID_4x4_GRID
-      cell = sudoku.cellAt 1, 1
+      sudoku.cellAt(0,0).isNextTo(sudoku.cellAt(0,1)).should.equal true
+      sudoku.cellAt(0,0).isNextTo(sudoku.cellAt(1,0)).should.equal true
+      sudoku.cellAt(0,0).isNextTo(sudoku.cellAt(1,1)).should.equal false
+      sudoku.cellAt(0,0).isNextTo(sudoku.cellAt(0,2)).should.equal false
 
-    it "should start out empty", ->
-      makeCell().entriesAsString().should.equal ''
+    describe "entries", ->
 
-    it "should accept an entry", ->
-      cell = makeCell()
-      cell.enter 1
-      cell.entriesAsString().should.equal '1'
+      makeCell = () ->
+        sudoku = new Sudoku A_VALID_4x4_GRID
+        cell = sudoku.cellAt 1, 1
 
-    it "should accept another entry", ->
-      cell = makeCell()
-      cell.enter 1
-      cell.enter 2
-      cell.entriesAsString().should.equal '12'
+      it "should start out empty", ->
+        makeCell().entriesAsString().should.equal ''
 
-    it "should toggle entered values", ->
-      cell = makeCell()
-      cell.enter 1
-      cell.enter 2
-      cell.enter 1
-      cell.entriesAsString().should.equal '2'
+      it "should accept an entry", ->
+        cell = makeCell()
+        cell.enter 1
+        cell.entriesAsString().should.equal '1'
 
-    it "should just ignore invalid entries", ->
-      sudoku = new Sudoku A_VALID_4x4_GRID
-      cell = sudoku.cellAt 0, 0
-      cell.enter '5'
-      cell.entriesAsString().should.equal ''
+      it "should accept another entry", ->
+        cell = makeCell()
+        cell.enter 1
+        cell.enter 2
+        cell.entriesAsString().should.equal '12'
+
+      it "should toggle entered values", ->
+        cell = makeCell()
+        cell.enter 1
+        cell.enter 2
+        cell.enter 1
+        cell.entriesAsString().should.equal '2'
+
+      it "should just ignore invalid entries", ->
+        sudoku = new Sudoku A_VALID_4x4_GRID
+        cell = sudoku.cellAt 0, 0
+        cell.enter '5'
+        cell.entriesAsString().should.equal ''
 
 describe "Killer", ->
 
@@ -225,4 +226,52 @@ describe "Region", ->
       region.push new Cell MOCK_VALID_SUDOKU, 1, 1, 1
       region.push new Cell MOCK_VALID_SUDOKU, 2, 1, 2
       region.push new Cell MOCK_VALID_SUDOKU, 2, 0, 3
-      ( -> region.push new Cell MOCK_VALID_SUDOKU, 3, 3, 4).should.throw 'Non-contiguous cell (3,3) pushed to region you bozo'
+      region.push new Cell MOCK_VALID_SUDOKU, 3, 3, 4
+      ( -> region.validate() ).should.throw 'Non-contiguous cell (3,3) pushed to region you bozo'
+
+describe "9x9 grids", ->
+
+  it "should all just work for these as well", ->
+
+    values = [
+
+      1,2,3,  4,5,6,  7,8,9
+      4,5,6,  7,8,9,  1,2,3
+      7,8,9,  1,2,3,  4,5,6
+
+      2,3,1,  5,6,4,  8,9,7
+      5,6,4,  8,9,7,  2,3,1
+      8,9,7,  2,3,1,  5,6,4
+
+      3,1,2,  6,4,5,  9,7,8
+      6,4,5,  9,7,8,  3,1,2
+      9,7,8,  3,1,2,  6,4,5
+
+    ]
+
+    regions = [
+
+      1, 1, 2,    2, 3, 4,    4, 5, 5
+      1, 6, 6,    3, 3, 3,    8, 8, 5
+      9,10,11,   11,11,11,   11,12,13
+
+      9,10,14,    14,15,16,   16,12,13
+      14,14,14,   14,15,16,   16,16,16
+      17,18,18,   15,15,15,   19,19,20
+
+      17,18,21,   21,21,21,   21,19,20
+      17,18,22,   23,21,24,   25,19,20
+      22,22,22,   23,21,24,   25,25,25
+
+    ]
+
+    killer = new Killer values, regions
+
+    killer.size.should.equal 9
+    killer.root.should.equal 3
+    killer.rows[0].values().join('').should.equal '123456789'
+    killer.cols[0].values().join('').should.equal '147258369'
+    killer.boxes[0].values().join('').should.equal '123456789'
+    killer.validValues.join('').should.equal '123456789'
+    killer.regions[0].sum().should.equal 7
+
