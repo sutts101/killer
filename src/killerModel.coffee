@@ -37,7 +37,7 @@ class CellBlock
   constructor: -> @cells = []
 
   push: (cell) ->
-#    throw new Error "Duplicate value '#{cell.value}' at row #{cell.row} column #{cell.col}" if cell.value in @values()
+    throw new Error "Duplicate value '#{cell.value}' at row #{cell.row} column #{cell.col}" if cell.value in @values()
     @cells.push cell
 
   values: -> @cells.map (cell) => cell.value
@@ -67,6 +67,8 @@ class Cell
 
   entriesAsString: () ->
     @entries.join ''
+
+  toString: -> "#{@row},#{@col}:#{@value}"
 
 class Killer extends Sudoku
 
@@ -98,7 +100,7 @@ class Region
         if existing.isNextTo(cell)
           @cells.push cell
           return
-#      throw new Error "Non-contiguous cell (#{cell.row},#{cell.col}) pushed to region you bozo"
+      throw new Error "Non-contiguous cell (#{cell.row},#{cell.col}) pushed to region you bozo"
 
   sum: () ->
     values = @cells.map (cell) -> cell.value

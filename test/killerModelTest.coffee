@@ -79,7 +79,7 @@ describe "Sudoku", ->
         for index in [0..3]
           sudoku[blockType][index].sum().should.equal 10
 
-    xit "should complain if any of the blocks contain duplicates", ->
+    it "should complain if any of the blocks contain duplicates", ->
       bad = [
         1,2,3,4
         2,3,4,1
@@ -151,7 +151,7 @@ describe "Cell", ->
       cell.enter 1
       cell.entriesAsString().should.equal '2'
 
-    xit "should just ignore invalid entries", ->
+    it "should just ignore invalid entries", ->
       sudoku = new Sudoku A_VALID_4x4_GRID
       cell = sudoku.cellAt 0, 0
       cell.enter '5'
@@ -168,14 +168,14 @@ describe "Killer", ->
 
     values = [
       4,1,2,3
-      3,4,1,2,
-      1,2,3,4,
-      2,3,4,1,
+      3,2,4,1,
+      1,4,3,2,
+      2,3,1,4
     ]
 
     regions = [
       1,1,2,2,
-      3,3,4,4,
+      1,3,4,2,
       5,5,6,6,
       7,7,8,8
     ]
@@ -188,8 +188,8 @@ describe "Killer", ->
     describe "region (integration context)", ->
 
       it "should sum the values of the contained cells", ->
-        killer.regions[0].sum().should.equal 5
-        killer.regions[2].sum().should.equal 7
+        killer.regions[0].sum().should.equal 8
+        killer.regions[7].sum().should.equal 5
 
 describe "Region", ->
 
@@ -220,7 +220,7 @@ describe "Region", ->
 
   describe "well formed", ->
 
-    xit "should complain if a non-contiguous cell is pushed", ->
+    it "should complain if a non-contiguous cell is pushed", ->
       region = new Region 'whatever'
       region.push new Cell MOCK_VALID_SUDOKU, 1, 1, 1
       region.push new Cell MOCK_VALID_SUDOKU, 2, 1, 2
