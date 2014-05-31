@@ -40,6 +40,7 @@ class CellBlock
   push: (cell) ->
     throw new Error "Duplicate value '#{cell.value}' at row #{cell.row} column #{cell.col}" if cell.value in @values() and cell.value isnt null
     @cells.push cell
+    cell.blocks.push this
 
   values: -> @cells.map (cell) => cell.value
 
@@ -47,7 +48,9 @@ class CellBlock
 
 class Cell
 
-  constructor: (@sudoku, @row, @col, @value) -> @entries = []
+  constructor: (@sudoku, @row, @col, @value) ->
+    @entries = []
+    @blocks = []
 
   isNextTo: (cell) ->
     rowDiff = Math.abs(@row - cell.row)
@@ -58,6 +61,14 @@ class Cell
   down:  -> @sudoku.cellAt @row + 1, @col
   left:  -> @sudoku.cellAt @row,     @col - 1 unless @col == 0
   right: -> @sudoku.cellAt @row,     @col + 1 unless @col >= (@sudoku.size - 1)
+
+  availableValues: ->
+    allValues = @sudoku.validValues[0..@sudoku.validValues.length]
+    for block in @blocks
+      for cell in block.cells
+        unless cell is this
+          allValues = allValues.filter (e) -> e isnt cell.value
+    allValues
 
   enter: (value) ->
     if value in @sudoku.validValues
@@ -117,7 +128,7 @@ class Region
 
 class SudokuStringifier
 
-  stringify: (sudoku) ->
+  @stringify: (sudoku) ->
     out = ""
     for row in [0...sudoku.size]
       for col in [0...sudoku.size]

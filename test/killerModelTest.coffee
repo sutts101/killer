@@ -161,6 +161,15 @@ describe "Sudoku", ->
         cell.enter '5'
         cell.entriesAsString().should.equal ''
 
+      it "should have only 1 available value (its own) where there are no nulls in play", ->
+        cell = makeCell()
+        cell.availableValues().length.should.equal 1
+        cell.availableValues()[0].should.equal cell.value
+
+      it "should have all available values where there are only nulls in play", ->
+        sudoku = new Sudoku [0...16].map (i) -> null
+        sudoku.cellAt(1, 1).availableValues().join('').should.equal '1234'
+
 describe "Killer", ->
 
   describe "constructor (unhappy path)", ->

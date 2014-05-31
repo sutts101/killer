@@ -10,7 +10,8 @@ createRandomSudoku = (root) ->
 
   worker = (working, index) ->
     values = working.values()
-    candidates = working.validValues[0...working.validValues.length]
+    cell = working.cellAt Math.floor(index / working.size), index % working.size
+    candidates = cell.availableValues()
     while candidates.length > 0
       candidate = candidates[Math.floor(Math.random() * candidates.length)]
       candidates = candidates.filter (e) -> e isnt candidate
@@ -27,6 +28,8 @@ createRandomSudoku = (root) ->
   gottaStartSomewhere = new Sudoku [0...numCells].map (i) -> null
   return worker gottaStartSomewhere, 0
 
+start = new Date().getTime()
 result = createRandomSudoku 3
-stringifier = new SudokuStringifier
-console.log stringifier.stringify result
+end = new Date().getTime()
+console.log SudokuStringifier.stringify result
+console.log "Completed in #{end - start} ms"
