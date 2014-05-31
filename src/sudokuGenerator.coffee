@@ -1,4 +1,4 @@
-{Sudoku} = require '../src/killerModel'
+{Sudoku,SudokuStringifier} = require '../src/killerModel'
 
 createRandomSudoku = (root) ->
 
@@ -18,7 +18,7 @@ createRandomSudoku = (root) ->
       next = returnValidNewSudokuOrNull values
       if next?
         if (index + 1) is Math.pow(working.size, 2)
-          return values
+          return next
         else
           result = worker next, index+1
           return result if result?
@@ -28,4 +28,5 @@ createRandomSudoku = (root) ->
   return worker gottaStartSomewhere, 0
 
 result = createRandomSudoku 3
-console.log result.join ','
+stringifier = new SudokuStringifier
+console.log stringifier.stringify result

@@ -29,7 +29,6 @@ class Sudoku
         boxIndex = (Math.floor(row / @root) * @root) + Math.floor(col / @root)
         @boxes[boxIndex].push cell
 
-
   cellAt: (row, col) -> @cells[(row * @size) + col]
 
   values: -> @cells.map (cell) => cell.value
@@ -116,8 +115,23 @@ class Region
   contains: (cell) ->
     cell in @cells
 
+class SudokuStringifier
+
+  stringify: (sudoku) ->
+    out = ""
+    for row in [0...sudoku.size]
+      for col in [0...sudoku.size]
+        out += sudoku.cellAt(row, col).value
+        out += '  ' if (col + 1) % sudoku.root is 0
+        out += ' ' if col < sudoku.size - 1
+      out += '\n' if (row + 1) % sudoku.root is 0
+      out += '\n' if row < sudoku.size - 1
+    out
+
+
 root = exports ? window
 root.Sudoku = Sudoku
 root.Cell = Cell
 root.Killer = Killer
 root.Region = Region
+root.SudokuStringifier = SudokuStringifier
