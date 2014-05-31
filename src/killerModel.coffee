@@ -102,12 +102,9 @@ class Killer extends Sudoku
     for region in @regions
       region.validate()
 
-class Region
+class Region extends CellBlock
 
-  constructor: (@id) ->
-    @cells = []
-
-  push: (cell) -> @cells.push cell
+  constructor: (@id) -> super()
 
   validate: ->
     throw new Error "Huh, empty region - how did that happen???" if @cells.length is 0
@@ -119,12 +116,7 @@ class Region
       for cell in @cells
         throw new Error "Non-contiguous cell (#{cell.row},#{cell.col}) pushed to region you bozo" unless hasAtLeastOneNeighbour cell
 
-  sum: () ->
-    values = @cells.map (cell) -> cell.value
-    values.reduce (x,y) -> x + y
-
-  contains: (cell) ->
-    cell in @cells
+  contains: (cell) -> cell in @cells
 
 class SudokuStringifier
 

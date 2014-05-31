@@ -198,25 +198,15 @@ describe "Killer", ->
     it "should create 8 regions", ->
       killer.regions.length.should.equal 8
 
-    describe "region (integration context)", ->
-
-      it "should sum the values of the contained cells", ->
-        killer.regions[0].sum().should.equal 8
-        killer.regions[7].sum().should.equal 5
+    it "should set the regions up correctly such that region sums are as they should be", ->
+      killer.regions[0].sum().should.equal 8
+      killer.regions[7].sum().should.equal 5
 
 describe "Region", ->
 
   MOCK_VALID_SUDOKU = {size: 4, root: 2}
 
-  describe "sum", ->
-
-    it "should be the sum of the values of the contained cells", ->
-      region = new Region('whatever')
-      region.push new Cell MOCK_VALID_SUDOKU, 0, 0, 3
-      region.push new Cell MOCK_VALID_SUDOKU, 0, 1, 4
-      region.sum().should.equal 7
-
-  describe "contains", ->
+  it "should know whether a cell is contained or not", ->
 
     cell1 = new Cell MOCK_VALID_SUDOKU, 0, 0, 1
     cell2 = new Cell MOCK_VALID_SUDOKU, 0, 1, 2
@@ -225,21 +215,18 @@ describe "Region", ->
     region.push cell1
     region.push cell2
 
-    it "should know whether a cell is contained or not", ->
-      region.contains(cell1).should.be.true
-      region.contains(cell2).should.be.true
-      region.contains(cell3).should.be.false
+    region.contains(cell1).should.be.true
+    region.contains(cell2).should.be.true
+    region.contains(cell3).should.be.false
 
+  it "should complain if a non-contiguous cell is pushed", ->
 
-  describe "well formed", ->
-
-    it "should complain if a non-contiguous cell is pushed", ->
-      region = new Region 'whatever'
-      region.push new Cell MOCK_VALID_SUDOKU, 1, 1, 1
-      region.push new Cell MOCK_VALID_SUDOKU, 2, 1, 2
-      region.push new Cell MOCK_VALID_SUDOKU, 2, 0, 3
-      region.push new Cell MOCK_VALID_SUDOKU, 3, 3, 4
-      ( -> region.validate() ).should.throw 'Non-contiguous cell (3,3) pushed to region you bozo'
+    region = new Region 'whatever'
+    region.push new Cell MOCK_VALID_SUDOKU, 1, 1, 1
+    region.push new Cell MOCK_VALID_SUDOKU, 2, 1, 2
+    region.push new Cell MOCK_VALID_SUDOKU, 2, 0, 3
+    region.push new Cell MOCK_VALID_SUDOKU, 3, 3, 4
+    ( -> region.validate() ).should.throw 'Non-contiguous cell (3,3) pushed to region you bozo'
 
 describe "9x9 grids", ->
 
@@ -263,11 +250,11 @@ describe "9x9 grids", ->
 
     regions = [
 
-      1, 1, 2,    2, 3, 4,    4, 5, 5
-      1, 6, 6,    3, 3, 3,    8, 8, 5
-      9,10,11,   11,11,11,   11,12,13
+       1, 1, 2,    2, 3, 4,    4, 5, 5
+       1, 6, 6,    3, 3, 3,    8, 8, 5
+       9,10,11,   11,11,11,   11,12,13
 
-      9,10,14,    14,15,16,   16,12,13
+       9,10,14,   15,15,16,   16,12,13
       14,14,14,   14,15,16,   16,16,16
       17,18,18,   15,15,15,   19,19,20
 
