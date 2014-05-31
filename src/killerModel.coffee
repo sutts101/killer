@@ -32,6 +32,8 @@ class Sudoku
 
   cellAt: (row, col) -> @cells[(row * @size) + col]
 
+  values: -> @cells.map (cell) => cell.value
+
 class CellBlock
 
   constructor: -> @cells = []

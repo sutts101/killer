@@ -27,6 +27,9 @@ describe "Sudoku", ->
           cell.row.should.equal row
           cell.col.should.equal col
 
+    it "should round trip values nicely", ->
+      new Sudoku(A_VALID_4x4_GRID).values().join('').should.equal A_VALID_4x4_GRID.join('')
+
     it "should like square squares", ->
       new Sudoku [1]
       new Sudoku A_VALID_4x4_GRID
