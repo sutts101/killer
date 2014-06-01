@@ -39,20 +39,30 @@ class KillerCanvas
     @redraw()
 
   redraw: () =>
-    @ctx.setLineDash [1000]
-    @ctx.fillStyle = "#EEEEEE"
-    @ctx.fillRect 0, 0, @size, @size
-    if not @killer?
-      @_drawGridLines 9, @COLOR_FOR_GRID_LINES, @MINOR_GRID_LINE
-      @_drawGridLines 3, @COLOR_FOR_GRID_LINES, @MAJOR_GRID_LINE
+    if @killer?.isComplete()
+      @ctx.fillStyle = "darkgreen"
+      @ctx.fillRect 0, 0, @size, @size
+      @ctx.fillStyle = "#EEEEEE"
+      @ctx.font = "40px Arial"
+      @ctx.textAlign = 'center'
+      @ctx.textBaseline = 'middle'
+      rect = new Rectangle 0, 0, @size, @size
+      @ctx.fillText 'You did it!!!', rect.middle().x, rect.middle().y
     else
-      @_drawGridLines @killer.size, @COLOR_FOR_GRID_LINES, @MINOR_GRID_LINE
-      @_drawGridLines Math.sqrt(@killer.size), @COLOR_FOR_GRID_LINES, @MAJOR_GRID_LINE
-      @_assignCellBounds()
-      @_drawRegions()
-      @_drawRegionSums()
-      @_drawFocus()
-      @_drawEntries()
+      @ctx.setLineDash [1000]
+      @ctx.fillStyle = "#EEEEEE"
+      @ctx.fillRect 0, 0, @size, @size
+      if not @killer?
+        @_drawGridLines 9, @COLOR_FOR_GRID_LINES, @MINOR_GRID_LINE
+        @_drawGridLines 3, @COLOR_FOR_GRID_LINES, @MAJOR_GRID_LINE
+      else
+        @_drawGridLines @killer.size, @COLOR_FOR_GRID_LINES, @MINOR_GRID_LINE
+        @_drawGridLines Math.sqrt(@killer.size), @COLOR_FOR_GRID_LINES, @MAJOR_GRID_LINE
+        @_assignCellBounds()
+        @_drawRegions()
+        @_drawRegionSums()
+        @_drawFocus()
+        @_drawEntries()
 
   _assignCellBounds: ->
     w = h = @size / @killer.size
@@ -109,6 +119,7 @@ class KillerCanvas
   _drawRegionSums: () ->
     @ctx.fillStyle = @COLOR_FOR_REGIONS
     @ctx.font = "12px Arial"
+    @ctx.textAlign = 'left'
     @ctx.textBaseline = 'top'
     for region in @killer.regions
       cell = region.cells[0]

@@ -177,6 +177,20 @@ describe "Sudoku", ->
         sudoku = new Sudoku [0...16].map -> null
         sudoku.cellAt(1, 1).availableValues().join('').should.equal '1234'
 
+  describe "completion", ->
+
+    it "should start off incomplete", ->
+      sudoku = new Sudoku [1]
+      sudoku.cellAt(0, 0).hasCorrectEntry().should.equal false
+      sudoku.isComplete().should.equal false
+
+    it "should be incomplete when all cells are correctly entered", ->
+      sudoku = new Sudoku [1]
+      cell = sudoku.cellAt(0, 0)
+      cell.enter 1
+      cell.hasCorrectEntry().should.equal true
+      sudoku.isComplete().should.equal true
+
 describe "Killer", ->
 
   describe "constructor (unhappy path)", ->

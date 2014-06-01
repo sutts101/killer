@@ -39,6 +39,11 @@ class Sudoku
 
   values: -> @cells.map (cell) => cell.value
 
+  isComplete: ->
+    for cell in @cells
+      return false unless cell.hasCorrectEntry()
+    true
+
 class CellBlock
 
   constructor: -> @cells = []
@@ -87,6 +92,8 @@ class Cell
 
   entriesAsString: () ->
     @entries.join ''
+
+  hasCorrectEntry: -> @entries.length is 1 and @entries[0] is @value
 
   toString: -> "#{@row},#{@col}:#{@value}"
 
