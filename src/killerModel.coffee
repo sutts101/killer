@@ -75,6 +75,19 @@ class Cell
   left:  -> @sudoku.cellAt @row,     @col - 1 unless @col == 0
   right: -> @sudoku.cellAt @row,     @col + 1 unless @col >= (@sudoku.size - 1)
 
+  enter: (value) ->
+    if value in @sudoku.validValues
+      if value in @entries
+        @entries = @entries.filter (e) -> e isnt value
+      else
+        @entries.push value
+
+  entriesAsString: () -> @entries.join ''
+
+  entry: -> @entries[0] if @entries.length is 1
+
+  hasCorrectEntry: -> @entry() is @value
+
   availableValues: ->
     allValues = @sudoku.validValues[0..@sudoku.validValues.length]
     for block in @blocks
@@ -83,17 +96,13 @@ class Cell
           allValues = allValues.filter (e) -> e isnt cell.value
     allValues
 
-  enter: (value) ->
-    if value in @sudoku.validValues
-      if value in @entries
-        @entries = @entries.filter (e) -> e isnt value
-      else
-        @entries.push value
-
-  entriesAsString: () ->
-    @entries.join ''
-
-  hasCorrectEntry: -> @entries.length is 1 and @entries[0] is @value
+  availableEntries: ->
+    allValues = @sudoku.validValues[0..@sudoku.validValues.length]
+    for block in @blocks
+      for cell in block.cells
+        unless cell is this
+          allValues = allValues.filter (e) -> e isnt cell.entry()
+    allValues
 
   toString: -> "#{@row},#{@col}:#{@value}"
 
@@ -119,6 +128,21 @@ class Killer extends Sudoku
 
   regionIds: -> @cells.map (cell) => cell.region.id
 
+  entries: -> @cells.map (cell) => cell.entry()
+
+  isCompleteDisregardingValues: ->
+    for cell in @cells
+      return false unless cell.entry()?
+    for cell in @cells
+      for block in cell.blocks
+        for neighbour in block.cells
+          return false if cell.entry() is neighbour.entry unless cell is neighbour
+    for region in @regions
+      return false unless region.sumOfEntries() is region.sum()
+
+    true
+
+
 class Region extends CellBlock
 
   constructor: (@id) -> super()
@@ -134,6 +158,12 @@ class Region extends CellBlock
         throw new Error "Non-contiguous cell #{cell.toString()} pushed to region '#{@id}' you bozo" unless hasAtLeastOneNeighbour cell
 
   contains: (cell) -> cell in @cells
+
+  sumOfEntries: ->
+    sum = 0
+    for cell in @cells
+      sum += cell.entry() if cell.entry()?
+    sum
 
 class Generator
 
