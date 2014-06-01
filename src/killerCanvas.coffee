@@ -118,7 +118,7 @@ class KillerCanvas
 
   _drawRegionSums: () ->
     @ctx.fillStyle = @COLOR_FOR_REGIONS
-    @ctx.font = "12px Arial"
+    @ctx.font = "bold 12px Arial"
     @ctx.textAlign = 'left'
     @ctx.textBaseline = 'top'
     for region in @killer.regions
