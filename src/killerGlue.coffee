@@ -1,4 +1,5 @@
 #{Killer} = require 'killerModel'
+#{KillerGenerator} = require 'killerGenerator'
 #{KillerCanvas} = require 'killerCanvas'
 
 
@@ -38,7 +39,13 @@ $(document).ready ->
 
   Killer = window.Killer
   KillerCanvas = window.KillerCanvas
+  KillerGenerator = window.KillerGenerator
 
   killer = new Killer values, regions
+
+  killerGenerator = new KillerGenerator()
+  killer = killerGenerator.generate killer
+
+
   canvas = new KillerCanvas document.getElementById('killer')
   canvas.model killer

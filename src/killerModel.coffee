@@ -52,6 +52,8 @@ class Cell
     @entries = []
     @blocks = []
 
+  index: -> (@row * @sudoku.size) + @col
+
   isNextTo: (cell) ->
     rowDiff = Math.abs(@row - cell.row)
     colDiff = Math.abs(@col - cell.col)
@@ -102,6 +104,8 @@ class Killer extends Sudoku
     for region in @regions
       region.validate()
 
+  regionIds: -> @cells.map (cell) => cell.region.id
+
 class Region extends CellBlock
 
   constructor: (@id) -> super()
@@ -114,7 +118,7 @@ class Region extends CellBlock
           return true if other isnt cell and other.isNextTo cell
         false
       for cell in @cells
-        throw new Error "Non-contiguous cell (#{cell.row},#{cell.col}) pushed to region you bozo" unless hasAtLeastOneNeighbour cell
+        throw new Error "Non-contiguous cell #{cell.toString()} pushed to region '#{@id}' you bozo" unless hasAtLeastOneNeighbour cell
 
   contains: (cell) -> cell in @cells
 

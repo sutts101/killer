@@ -121,8 +121,15 @@ describe "Sudoku", ->
 
   describe "cells", ->
 
+    sudoku = new Sudoku A_VALID_4x4_GRID
+
+    it "should be able to convert back to cell index", ->
+      sudoku.cellAt(0,0).index().should.equal 0
+      sudoku.cellAt(0,1).index().should.equal 1
+      sudoku.cellAt(1,0).index().should.equal 4
+      sudoku.cellAt(3,3).index().should.equal 15
+
     it "should recognise contiguous cells", ->
-      sudoku = new Sudoku A_VALID_4x4_GRID
       sudoku.cellAt(0,0).isNextTo(sudoku.cellAt(0,1)).should.equal true
       sudoku.cellAt(0,0).isNextTo(sudoku.cellAt(1,0)).should.equal true
       sudoku.cellAt(0,0).isNextTo(sudoku.cellAt(1,1)).should.equal false
@@ -132,7 +139,7 @@ describe "Sudoku", ->
 
       makeCell = () ->
         sudoku = new Sudoku A_VALID_4x4_GRID
-        cell = sudoku.cellAt 1, 1
+        sudoku.cellAt 1, 1
 
       it "should start out empty", ->
         makeCell().entriesAsString().should.equal ''
@@ -167,7 +174,7 @@ describe "Sudoku", ->
         cell.availableValues()[0].should.equal cell.value
 
       it "should have all available values where there are only nulls in play", ->
-        sudoku = new Sudoku [0...16].map (i) -> null
+        sudoku = new Sudoku [0...16].map -> null
         sudoku.cellAt(1, 1).availableValues().join('').should.equal '1234'
 
 describe "Killer", ->
@@ -194,6 +201,9 @@ describe "Killer", ->
     ]
 
     killer = new Killer values, regions
+
+    it "should be able to round trip region ids", ->
+      killer.regionIds().join('').should.equal regions.join ''
 
     it "should create 8 regions", ->
       killer.regions.length.should.equal 8
@@ -226,7 +236,7 @@ describe "Region", ->
     region.push new Cell MOCK_VALID_SUDOKU, 2, 1, 2
     region.push new Cell MOCK_VALID_SUDOKU, 2, 0, 3
     region.push new Cell MOCK_VALID_SUDOKU, 3, 3, 4
-    ( -> region.validate() ).should.throw 'Non-contiguous cell (3,3) pushed to region you bozo'
+    ( -> region.validate() ).should.throw "Non-contiguous cell 3,3:4 pushed to region 'whatever' you bozo"
 
 describe "9x9 grids", ->
 
@@ -282,4 +292,4 @@ describe "nulls", ->
     incompleteModel = [1,2,3,4]
     incompleteModel.push null for index in [incompleteModel.length..15]
 
-    sudoku = new Sudoku incompleteModel
+    new Sudoku incompleteModel
