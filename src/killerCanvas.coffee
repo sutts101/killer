@@ -1,5 +1,3 @@
-#{Sudoku, Cell, Killer, Region} = require 'killerModel'
-
 class Rectangle
 
   constructor: (@x, @y, @w, @h) ->
@@ -20,7 +18,7 @@ class KillerCanvas
   REGION_INSET:         5
   REGION_SUM_INSET:     3
   COLOR_FOR_GRID_LINES: 'black'
-  COLOR_FOR_REGIONS:    'green'
+  COLOR_FOR_REGIONS:    'darkgreen'
   COLOR_FOR_FOCUS:      'yellow'
   COLOR_FOR_ENTRIES:    'darkblue'
 
@@ -85,7 +83,7 @@ class KillerCanvas
         (2 * @REGION_INSET)
       else
         0
-    @ctx.strokeStyle = 'green'
+    @ctx.strokeStyle = @COLOR_FOR_REGIONS
     @ctx.setLineDash [1]
     @ctx.lineWidth = 1
     @ctx.beginPath()
@@ -110,7 +108,7 @@ class KillerCanvas
 
   _drawRegionSums: () ->
     @ctx.fillStyle = @COLOR_FOR_REGIONS
-    @ctx.font = "11px Arial"
+    @ctx.font = "12px Arial"
     @ctx.textBaseline = 'top'
     for region in @killer.regions
       cell = region.cells[0]
@@ -119,16 +117,16 @@ class KillerCanvas
 
   _drawFocus: () ->
     if @focusCell?
-      rect = @focusCell.bounds.innerRect 3 * @REGION_INSET
+      rect = @focusCell.bounds.innerRect 2 * @REGION_INSET
       @ctx.fillStyle = @COLOR_FOR_FOCUS
       @ctx.fillRect rect.x, rect.y, rect.w, rect.h
 
   _drawEntries: () ->
     fontSize = (numEntries) =>
       if numEntries is 1
-        30
+        24
       else if numEntries < 5
-        15
+        13
       else
         10
     @ctx.fillStyle = @COLOR_FOR_ENTRIES
@@ -171,7 +169,6 @@ class KillerCanvas
         @redraw()
       else
         false
-
 
 root = exports ? window
 root.KillerCanvas = KillerCanvas

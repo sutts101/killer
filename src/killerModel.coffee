@@ -1,3 +1,9 @@
+do -> Array::shuffle ?= ->
+  for i in [@length-1..1]
+    j = Math.floor Math.random() * (i + 1)
+    [@[i], @[j]] = [@[j], @[i]]
+  @
+
 class Sudoku
 
   constructor: (values) ->
@@ -122,6 +128,66 @@ class Region extends CellBlock
 
   contains: (cell) -> cell in @cells
 
+class Generator
+
+  @generateSudoku = (root) ->
+
+    returnValidNewSudokuOrNull = (values) ->
+      try
+        return new Sudoku values
+      catch
+        return null
+
+    worker = (working, index) ->
+      values = working.values()
+      cell = working.cellAt Math.floor(index / working.size), index % working.size
+      candidates = cell.availableValues()
+      while candidates.length > 0
+        candidate = candidates[Math.floor(Math.random() * candidates.length)]
+        candidates = candidates.filter (e) -> e isnt candidate
+        values[index] = candidate
+        next = returnValidNewSudokuOrNull values
+        if next?
+          if (index + 1) is Math.pow(working.size, 2)
+            return next
+          else
+            result = worker next, index+1
+            return result if result?
+
+    numCells = Math.pow root, 4
+    sudokuWhereAllCellsHaveValueNull = new Sudoku [0...numCells].map (i) -> null
+    worker sudokuWhereAllCellsHaveValueNull, 0
+
+
+  @generateKiller = (sudoku) ->
+
+    mergeAwaySingleCellRegions = (killer) ->
+      regionsWithOnlyOneCell = killer.regions.filter (r) => r.cells.length is 1
+      if regionsWithOnlyOneCell.length > 0
+        regionToKill = regionsWithOnlyOneCell[Math.floor(Math.random() * regionsWithOnlyOneCell.length)]
+        cellToRelocate = regionToKill.cells[0]
+        cellToBecomeNeighbour = findValidMergeTarget cellToRelocate
+        if cellToBecomeNeighbour?
+          values = killer.values()
+          regions = killer.regionIds()
+          regions[cellToRelocate.index()] = cellToBecomeNeighbour.region.id
+          killer = mergeAwaySingleCellRegions new Killer values, regions
+      killer
+
+    findValidMergeTarget = (cellToRelocate) ->
+      directions = ['up', 'right', 'left', 'down'].shuffle()
+      for direction in directions
+        cellToBecomeNeighbour = cellToRelocate[direction]()
+        if cellToBecomeNeighbour?
+          valuesAlreadyInRegion = cellToBecomeNeighbour.region.cells.map (cell) => cell.value
+          if valuesAlreadyInRegion.indexOf(cellToRelocate.value) is -1
+            return cellToBecomeNeighbour
+      return null
+
+    killerWhereAllRegionsHaveOnlyCell = new Killer sudoku.values(), sudoku.values().map (value, index) => index
+    mergeAwaySingleCellRegions killerWhereAllRegionsHaveOnlyCell
+
+
 class SudokuStringifier
 
   @stringify: (sudoku) ->
@@ -142,3 +208,4 @@ root.Cell = Cell
 root.Killer = Killer
 root.Region = Region
 root.SudokuStringifier = SudokuStringifier
+root.Generator = Generator
