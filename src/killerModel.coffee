@@ -227,9 +227,26 @@ class Generator
             return cellToBecomeNeighbour
       return null
 
-    killerWhereAllRegionsHaveOnlyCell = new Killer sudoku.values(), sudoku.values().map (value, index) => index
-    mergeAwaySingleCellRegions killerWhereAllRegionsHaveOnlyCell
+    createInitialRegionsArray = (thresholdForDoubles) ->
+      regions = sudoku.cells.map (cell) -> cell
+      for region,index in regions
+        if regions[index].value?
+          # grab the cell
+          cell = regions[index]
+          # replace in array with region id
+          regions[index] = index
+          # randomize
+          random = Math.random() * 1
+          if random >= thresholdForDoubles
+            # make a double but do we go up or down?
+            if random > (1 - thresholdForDoubles) / 2 and cell.col isnt sudoku.size - 1
+              regions[index + 1] = index
+            else if cell.row isnt sudoku.size - 1
+              regions[index + sudoku.size] = index
+      regions
 
+    killerWhereAllRegionsHaveOnlyOneOrTwoCells = new Killer sudoku.values(), createInitialRegionsArray(0.2)
+    mergeAwaySingleCellRegions killerWhereAllRegionsHaveOnlyOneOrTwoCells
 
 class SudokuStringifier
 
