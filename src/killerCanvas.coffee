@@ -38,8 +38,8 @@ class KillerCanvas
     @focusCell = @killer?.cellAt 0, 0
     @redraw()
 
-  redraw: () =>
-    if @killer?.isComplete()
+  redraw: (checkForCompletion = false) =>
+    if checkForCompletion and @killer?.isCompleteDisregardingValues()
       @ctx.fillStyle = "darkgreen"
       @ctx.fillRect 0, 0, @size, @size
       @ctx.fillStyle = "#EEEEEE"
@@ -47,7 +47,8 @@ class KillerCanvas
       @ctx.textAlign = 'center'
       @ctx.textBaseline = 'middle'
       rect = new Rectangle 0, 0, @size, @size
-      @ctx.fillText 'You did it!!!', rect.middle().x, rect.middle().y
+      @ctx.fillText "You did it!!!", rect.middle().x, rect.middle().y
+      console.log "Although that is not the exact solution I had in mind..." unless @killer.isComplete()
     else
       @ctx.setLineDash [1000]
       @ctx.fillStyle = "#EEEEEE"
@@ -169,7 +170,7 @@ class KillerCanvas
       value = String.fromCharCode(evt.keyCode)
       if evt.keyCode in [49..57]
         @focusCell.enter parseInt(value)
-        @redraw()
+        @redraw(true)
       else if evt.keyCode in [37..40]
         movement = {37: 'left', 38: 'up', 39: 'right', 40: 'down'}[evt.keyCode]
         if @focusCell[movement]()?
