@@ -31,6 +31,13 @@ describe 'SumCalculator', ->
     calc.calculate(2, 2).join(',').should.equal ''
     calc.calculate(99, 3).join(',').should.equal ''
 
+  it "should do includes", ->
+    calc.calculate(1, 1, [1]).join(',').should.equal '1'
+    calc.calculate(2, 1, [1]).join(',').should.equal ''
+    calc.calculate(5, 2, [1]).join(',').should.equal '1,4'
+
+  it "should treat empty includes as no includes", ->
+    calc.calculate(5, 2, []).join(',').should.equal '1,4,2,3'
 
   calc9 = new SumCalculator [1..9]
 
@@ -41,3 +48,4 @@ describe 'SumCalculator', ->
     calc9.calculate(17, 2).join(',').should.equal '8,9'
     calc9.calculate(23, 3).join(',').should.equal '6,8,9'
     calc9.calculate(24, 3).join(',').should.equal '7,8,9'
+    calc9.calculate(12, 4, [1,2]).join(',').should.equal '1,2,3,6,1,2,4,5'

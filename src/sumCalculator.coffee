@@ -1,8 +1,10 @@
+_ = require 'lodash'
+
 class SumCalculator
 
   constructor: (@values) ->
 
-  calculate: (sum, length) ->
+  calculate: (sum, length, includes) ->
 
     solutions = []
 
@@ -17,6 +19,10 @@ class SumCalculator
 
     for value in @values
       hunt @values, [], value
+
+    if includes? and includes.length > 0
+      solutions = solutions.filter (a) ->
+        _.intersection(a, includes).length is includes.length
 
     solutions
 
