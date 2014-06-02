@@ -92,6 +92,13 @@ describe "Sudoku", ->
       ]
       ( -> new Sudoku bad ).should.throw "Duplicate value '2' at row 1 column 0"
 
+    it "should do entries", ->
+
+      sudoku = new Sudoku A_VALID_4x4_GRID
+      sudoku.cellAt(0,0).enter 1
+      sudoku.cellAt(0,1).enter 2
+      sudoku.rows[0].entries().join(',').should.equal '1,2'
+
   describe "cell movement", ->
 
     sudoku = new Sudoku A_VALID_4x4_GRID

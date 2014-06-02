@@ -5,7 +5,7 @@ chai.should()
 
 describe 'SumCalculator', ->
 
-  calc = new SumCalculator [1..4]
+  calc = new SumCalculator 4
 
   it "should do length 1 stuff rather easily", ->
     for number in [1,2,3,4]
@@ -39,7 +39,7 @@ describe 'SumCalculator', ->
   it "should treat empty includes as no includes", ->
     calc.calculate(5, 2, []).join(',').should.equal '1,4,2,3'
 
-  calc9 = new SumCalculator [1..9]
+  calc9 = new SumCalculator 9
 
   it "shouldn't make any difference working with bigger ranges", ->
     for number in [1..9]

@@ -57,6 +57,12 @@ class CellBlock
 
   sum: -> @values().reduce (x,y) -> x + y
 
+  entries: ->
+    entries = []
+    for cell in @cells
+      entries.push cell.entry() if cell.entry()?
+    entries
+
 class Cell
 
   constructor: (@sudoku, @row, @col, @value) ->

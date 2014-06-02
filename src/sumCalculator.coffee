@@ -2,7 +2,7 @@ _ = require 'lodash'
 
 class SumCalculator
 
-  constructor: (@values) ->
+  constructor: (max) -> @values = [1..max]
 
   calculate: (sum, length, includes) ->
 
