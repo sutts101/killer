@@ -39,7 +39,7 @@ class KillerCanvas
     @redraw()
 
   redraw: (checkForCompletion = false) =>
-    if checkForCompletion and @killer?.isCompleteDisregardingValues()
+    if checkForCompletion and @killer?.isComplete()
       @ctx.fillStyle = "darkgreen"
       @ctx.fillRect 0, 0, @size, @size
       @ctx.fillStyle = "#EEEEEE"
@@ -48,7 +48,7 @@ class KillerCanvas
       @ctx.textBaseline = 'middle'
       rect = new Rectangle 0, 0, @size, @size
       @ctx.fillText "You did it!!!", rect.middle().x, rect.middle().y
-      console.log "Although that is not the exact solution I had in mind..." unless @killer.isComplete()
+      console.log "Although that is not the exact solution I had in mind..." unless @killer.isCompleteWithPreordainedEntries()
     else
       @ctx.setLineDash [1000]
       @ctx.fillStyle = "#EEEEEE"

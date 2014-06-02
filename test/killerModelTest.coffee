@@ -99,6 +99,29 @@ describe "Sudoku", ->
       sudoku.cellAt(0,1).enter 2
       sudoku.rows[0].entries().join(',').should.equal '1,2'
 
+    it "should be incomplete unless all cells have valid (distinct) entries", ->
+
+      sudoku = new Sudoku A_VALID_4x4_GRID
+      sudoku.cellAt(0, 0).enter 1
+      sudoku.cellAt(0, 1).enter 2
+      sudoku.cellAt(0, 2).enter 3
+      sudoku.rows[0].isComplete().should.equal false
+
+      sudoku.cellAt(0, 3).enter 3
+      sudoku.rows[0].isComplete().should.equal false
+
+      sudoku.cellAt(0, 3).enter 3
+      sudoku.cellAt(0, 3).enter 4
+      sudoku.rows[0].isComplete().should.equal true
+
+    it "should be complete when all cells have valid entries (whereby valid means not necessarily the same as the underlying value)", ->
+
+      sudoku = new Sudoku A_VALID_4x4_GRID
+      sudoku.cellAt(1, col).enter(col + 1) for col in [0..3]
+
+      sudoku.cellAt(1,0).value.should.not.equal sudoku.cellAt(1,0).entry()
+      sudoku.rows[1].isComplete().should.equal true
+
   describe "cell movement", ->
 
     sudoku = new Sudoku A_VALID_4x4_GRID
@@ -175,67 +198,118 @@ describe "Sudoku", ->
         cell.enter '5'
         cell.entriesAsString().should.equal ''
 
-      it "should have only 1 available value (its own) where there are no nulls in play", ->
-        cell = makeCell()
-        cell.availableValues().length.should.equal 1
-        cell.availableValues()[0].should.equal cell.value
+      describe "entry", ->
 
-      it "should have all available values where there are only nulls in play", ->
-        sudoku = new Sudoku [0...16].map -> null
-        sudoku.cellAt(1, 1).availableValues().join('').should.equal '1234'
+        it "should be undefined if no entries", ->
+          cell = makeCell()
+          (cell.entry() is undefined).should.equal true
+
+        it "should be undefined if more than one entry", ->
+          cell = makeCell()
+          cell.enter 2
+          cell.enter 3
+          (cell.entry() is undefined).should.equal true
+
+        it "should be the entered value if there is only one of these", ->
+          cell = makeCell()
+          cell.enter 2
+          cell.entry().should.equal 2
+
+      describe "hasPreordainedEntry", ->
+
+        it "should be false if no entries", ->
+          cell = makeCell()
+          cell.hasPreordainedEntry().should.equal false
+
+        it "should be false if more than one entry", ->
+          cell = makeCell()
+          cell.enter value for value in [1..4]
+          cell.hasPreordainedEntry().should.equal false
+
+        it "should be true if the sole entered value is also the 'correct' value", ->
+          cell = makeCell()
+          cell.enter cell.value
+          cell.hasPreordainedEntry().should.equal true
+
+      describe "availableValues", ->
+
+        it "should have only 1 available value (its own) where there are no nulls in play", ->
+          cell = makeCell()
+          cell.availableValues().length.should.equal 1
+          cell.availableValues()[0].should.equal cell.value
+
+        it "should have all available values where there are only nulls in play", ->
+          sudoku = new Sudoku [0...16].map -> null
+          sudoku.cellAt(1, 1).availableValues().join('').should.equal '1234'
 
   describe "completion", ->
 
     it "should start off incomplete", ->
       sudoku = new Sudoku [1]
-      sudoku.cellAt(0, 0).hasCorrectEntry().should.equal false
       sudoku.isComplete().should.equal false
 
-    it "should be incomplete when all cells are correctly entered", ->
+    it "should be complete when all blocks report complete", ->
       sudoku = new Sudoku [1]
       cell = sudoku.cellAt(0, 0)
       cell.enter 1
-      cell.hasCorrectEntry().should.equal true
       sudoku.isComplete().should.equal true
+
+  describe "completion with 'preordained' values", ->
+
+    it "should start off incomplete", ->
+      sudoku = new Sudoku A_VALID_4x4_GRID
+      sudoku.isCompleteWithPreordainedEntries().should.equal false
+
+    it "should be complete when all blocks report complete", ->
+      sudoku = new Sudoku A_VALID_4x4_GRID
+      for cell in sudoku.cells
+        cell.hasPreordainedEntry().should.equal false
+        cell.enter cell.value
+        cell.hasPreordainedEntry().should.equal true
+      sudoku.isComplete().should.equal true
+      sudoku.isCompleteWithPreordainedEntries().should.equal true
 
 describe "Killer", ->
 
-  describe "constructor (unhappy path)", ->
+  it "should complain if length of regions array does not match that of values array", ->
+    ( -> new Killer [1], [1,2] ).should.throw "Incorrect number of regions you bozo"
 
-    it "should complain if length of regions array does not match that of values array", ->
-      ( -> new Killer [1], [1,2] ).should.throw "Incorrect number of regions you bozo"
+  values = [
+    4,1,2,3
+    3,2,4,1,
+    1,4,3,2,
+    2,3,1,4
+  ]
 
-  describe "constructor (happy path)", ->
+  regions = [
+    1,1,2,2,
+    1,3,4,2,
+    5,5,6,6,
+    7,7,8,8
+  ]
 
-    values = [
-      4,1,2,3
-      3,2,4,1,
-      1,4,3,2,
-      2,3,1,4
-    ]
+  killer = new Killer values, regions
 
-    regions = [
-      1,1,2,2,
-      1,3,4,2,
-      5,5,6,6,
-      7,7,8,8
-    ]
+  it "should be able to round trip region ids", ->
+    killer.regionIds().join('').should.equal regions.join ''
 
-    killer = new Killer values, regions
+  it "should create 8 regions", ->
+    killer.regions.length.should.equal 8
 
-    it "should be able to round trip region ids", ->
-      killer.regionIds().join('').should.equal regions.join ''
+  it "should set the regions up correctly such that region sums are as they should be", ->
+    killer.regions[0].sum().should.equal 8
+    killer.regions[7].sum().should.equal 5
 
-    it "should create 8 regions", ->
-      killer.regions.length.should.equal 8
+  it "should start out incomplete", ->
+    killer.isComplete().should.equal false
 
-    it "should set the regions up correctly such that region sums are as they should be", ->
-      killer.regions[0].sum().should.equal 8
-      killer.regions[7].sum().should.equal 5
+  it "should recognise completion", ->
+    cell.enter cell.value for cell in killer.cells
+    killer.isComplete().should.equal true
 
 describe "Region", ->
 
-  MOCK_VALID_SUDOKU = {size: 4, root: 2}
+  MOCK_VALID_SUDOKU = {size: 4, root: 2, validValues: [1,2,3,4]}
 
   it "should know whether a cell is contained or not", ->
 
@@ -258,6 +332,21 @@ describe "Region", ->
     region.push new Cell MOCK_VALID_SUDOKU, 2, 0, 3
     region.push new Cell MOCK_VALID_SUDOKU, 3, 3, 4
     ( -> region.validate() ).should.throw "Non-contiguous cell 3,3:4 pushed to region 'whatever' you bozo"
+
+  it "should test incompleteness based on sum of region and nothing else", ->
+
+    region = new Region 'whatever'
+    region.push new Cell MOCK_VALID_SUDOKU, 1, 1, 2
+    region.push new Cell MOCK_VALID_SUDOKU, 2, 1, 3
+
+    region.sum().should.equal 5
+    region.isComplete().should.equal false
+
+    region.cells[0].enter 1
+    region.cells[1].enter 4
+    region.isComplete().should.equal true
+
+
 
 describe "9x9 grids", ->
 

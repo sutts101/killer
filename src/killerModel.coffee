@@ -16,13 +16,16 @@ class Sudoku
     @validValues = [0...@size].map (value) => value + 1
 
     @cells = []
+    @blocks = []
     @rows = []
     @cols = []
     @boxes = []
 
     for blockType in ['rows', 'cols', 'boxes']
       for index in [0...@size]
-        @[blockType].push new CellBlock
+        block = new CellBlock
+        @blocks.push block
+        @[blockType].push block
 
     for row in [0...@size]
       for col in [0...@size]
@@ -40,8 +43,14 @@ class Sudoku
   values: -> @cells.map (cell) => cell.value
 
   isComplete: ->
+    for block in @blocks
+      return false unless block.isComplete()
+    true
+
+  isCompleteWithPreordainedEntries: ->
+    return false unless @isComplete()
     for cell in @cells
-      return false unless cell.hasCorrectEntry()
+      return false unless cell.hasPreordainedEntry()
     true
 
 class CellBlock
@@ -62,6 +71,14 @@ class CellBlock
     for cell in @cells
       entries.push cell.entry() if cell.entry()?
     entries
+
+  isComplete: ->
+    entrySet = @cells.map (cell, index) -> index + 1
+    for cell in @cells
+      entry = cell.entry()
+      return false unless entry?
+      entrySet = entrySet.filter (v) -> v isnt entry
+    return entrySet.length is 0
 
 class Cell
 
@@ -92,7 +109,7 @@ class Cell
 
   entry: -> @entries[0] if @entries.length is 1
 
-  hasCorrectEntry: -> @entry() is @value
+  hasPreordainedEntry: -> @entry() is @value
 
   availableValues: ->
     allValues = @sudoku.validValues[0..@sudoku.validValues.length]
@@ -136,18 +153,11 @@ class Killer extends Sudoku
 
   entries: -> @cells.map (cell) => cell.entry()
 
-  isCompleteDisregardingValues: ->
-    for cell in @cells
-      return false unless cell.entry()?
-    for cell in @cells
-      for block in cell.blocks
-        for neighbour in block.cells
-          return false if cell.entry() is neighbour.entry unless cell is neighbour
+  isComplete: ->
+    return false unless super
     for region in @regions
-      return false unless region.sumOfEntries() is region.sum()
-
+      return false unless region.isComplete()
     true
-
 
 class Region extends CellBlock
 
@@ -165,11 +175,12 @@ class Region extends CellBlock
 
   contains: (cell) -> cell in @cells
 
-  sumOfEntries: ->
-    sum = 0
+  isComplete: ->
+    runningTotal = 0
     for cell in @cells
-      sum += cell.entry() if cell.entry()?
-    sum
+      return false unless cell.entry()?
+      runningTotal += cell.entry()
+    runningTotal is @sum()
 
 class Generator
 
