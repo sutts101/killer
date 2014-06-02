@@ -128,7 +128,7 @@ class KillerCanvas
 
   _drawFocus: () ->
     if @focusCell?
-      rect = @focusCell.bounds.innerRect 2 * @REGION_INSET
+      rect = @focusCell.bounds.innerRect 3.5 * @REGION_INSET
       @ctx.fillStyle = @COLOR_FOR_FOCUS
       @ctx.fillRect rect.x, rect.y, rect.w, rect.h
 
