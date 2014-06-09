@@ -15,6 +15,10 @@
     <![endif]-->
 
     <style>
+        #help {
+            float: right;
+            width: 600px
+        }
         h1 {
             font-size: 24px;
         }
@@ -32,69 +36,63 @@
 <p></p>
 <div class="container">
     <div class="row">
-        <table width="100%" cellpadding="20" cellspacing="20">
-            <tr>
-                <td width="560" valign="top">
-                    <canvas id="killer" width="540" height="540" style="border:2px solid #000000;"></canvas>
-                </td>
-                <td valign="top">
-                    <div>
-                        <ul class="nav nav-tabs" data-tabs="tabs">
-                            <li class="active"><a href="#home" data-toggle="tab">Home</a></li>
-                            <li><a href="#sumCalculator" data-toggle="tab">Sum calculator</a></li>
-                            <li><a href="#about" data-toggle="tab">About</a></li>
-                        </ul>
-                        <div class="tab-content">
-                            <div class="tab-pane fade in active" id="home">
-                                <h1>Welcome to Ian's Killer Sudoku</h1>
-                                <p>
-                                    The <a href="http://en.wikipedia.org/wiki/Killer_sudoku" target="_blank">objective</a> is to fill the grid with numbers from 1 to 9 such that:
-                                <ul>
-                                    <li>Each row, column, and "nonet" (3x3 box of cells) contains each number exactly once</li>
-                                    <li>The sum of all numbers in a "cage" (region surrounded by dotted lines) matches the number shown in its corner</li>
-                                    <li>No number appears more than once in a cage</li>
-                                </ul>
-                                </p>
-                                <p>
-                                    To play:
-                                <ul>
-                                    <li>Use the mouse and/or cursor keys to focus on a cell</li>
-                                    <li>Use the keyboard to enter possible values (for example, if you have a cage with 2 cells and a sum of 3,
-                                        go to each cell and enter <span class="highlight">1</span> followed by <span class="highlight">2</span>)</li>
-                                    <li>Every time you enter a value, it will add it to the cell if is not already there, else remove</li>
-                                    <li>To <b>clear</b> all values from a cell, press <span class="highlight">c</span></li>
-                                    <li>To <b>undo</b> previous entry press <span class="highlight">z</span></li>
-                                    <li>To <b>redo</b> previous entry press <span class="highlight">y</span></li>
-                                </ul>
-                                </p>
-                            </div>
-                            <div class="tab-pane fade" id="sumCalculator">
-                                <h1>Sum calculator</h1>
-                                <p>
-                                    Coming soon!
-                                </p>
-                            </div>
-                            <div class="tab-pane fade" id="about">
-                                <h1>About this Killer Sudoku</h1>
-                                <p>
-                                    Written in CoffeeScript with copious help from <a href="http://visionmedia.github.io/mocha/" target="_blank">Mocha</a> +
-                                    <a href="https://github.com/visionmedia/should.js" target="_blank">should.js</a>. Uses HTML5 Canvas / Local Storage for render and persistence.
-                                </p>
-                                <p>
-                                    My first goal was to get it to the point where it works and is at least as good any other player I've ever seen.
-                                    I think I'm well on the way to achieving that - please let me know if you think differently!!</p>
-                                </p>
-                                <p>
-                                    A really interesting challenge with Sudokus in general is to write a Solver that thinks like a human (as opposed to
-                                    just applying computational brute force). That could open the door to some features to help (really help!) a user when
-                                    they're stuck. This is something I'm hoping to have a play with a little further down the road...
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-        </table>
+        <div id="help">
+            <ul class="nav nav-tabs" data-tabs="tabs">
+                <li class="active"><a href="#home" data-toggle="tab">Home</a></li>
+                <li><a href="#sumCalculator" data-toggle="tab">Sum calculator</a></li>
+                <li><a href="#about" data-toggle="tab">About</a></li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane fade in active" id="home">
+                    <h1>Welcome to Ian's Killer Sudoku</h1>
+                    <p>
+                        The <a href="http://en.wikipedia.org/wiki/Killer_sudoku" target="_blank">objective</a> is to fill the grid with numbers from 1 to 9 such that:
+                    <ul>
+                        <li>Each row, column, and "nonet" (3x3 box of cells) contains each number exactly once</li>
+                        <li>The sum of all numbers in a "cage" (region surrounded by dotted lines) matches the number shown in its corner</li>
+                        <li>No number appears more than once in a cage</li>
+                    </ul>
+                    </p>
+                    <p>
+                        To play:
+                    <ul>
+                        <li>Use the mouse and/or cursor keys to focus on a cell</li>
+                        <li>Use the keyboard to enter possible values (for example, if you have a cage with 2 cells and a sum of 3,
+                            go to each cell and enter <span class="highlight">1</span> followed by <span class="highlight">2</span>)</li>
+                        <li>Every time you enter a value, it will add it to the cell if is not already there, else remove</li>
+                        <li>To <b>clear</b> all values from a cell, press <span class="highlight">c</span></li>
+                        <li>To <b>undo</b> previous entry press <span class="highlight">z</span></li>
+                        <li>To <b>redo</b> previous entry press <span class="highlight">y</span></li>
+                    </ul>
+                    </p>
+                </div>
+                <div class="tab-pane fade" id="sumCalculator">
+                    <h1>Sum calculator</h1>
+                    <p>
+                        Coming soon!
+                    </p>
+                </div>
+                <div class="tab-pane fade" id="about">
+                    <h1>About this Killer Sudoku</h1>
+                    <p>
+                        Written in CoffeeScript with copious help from <a href="http://visionmedia.github.io/mocha/" target="_blank">Mocha</a> +
+                        <a href="https://github.com/visionmedia/should.js" target="_blank">should.js</a>. Uses HTML5 Canvas / Local Storage for render and persistence.
+                    </p>
+                    <p>
+                        My first goal was to get it to the point where it works and is at least as good any other player I've ever seen.
+                        I think I'm well on the way to achieving that - please let me know if you think differently!!</p>
+                    </p>
+                    <p>
+                        A really interesting challenge with Sudokus in general is to write a Solver that thinks like a human (as opposed to
+                        just applying computational brute force). That could open the door to some features to help (really help!) a user when
+                        they're stuck. This is something I'm hoping to have a play with a little further down the road...
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div id="game">
+            <canvas id="killer" width="540" height="540" style="border:2px solid #000000;"></canvas>
+        </div>
     </div>
     <div class="footer">
         <hr>
