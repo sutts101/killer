@@ -256,7 +256,7 @@ class Generator
               regions[index + sudoku.size] = index
       regions
 
-    killerWhereAllRegionsHaveOnlyOneOrTwoCells = new Killer sudoku.values(), createInitialRegionsArray(0.2)
+    killerWhereAllRegionsHaveOnlyOneOrTwoCells = new Killer sudoku.values(), createInitialRegionsArray(0.1)
     mergeAwaySingleCellRegions killerWhereAllRegionsHaveOnlyOneOrTwoCells
 
 class SudokuStringifier
