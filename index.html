@@ -92,6 +92,17 @@
         </div>
         <div id="game">
             <canvas id="killer" width="540" height="540" style="border:2px solid #000000;"></canvas>
+            <p>
+                New game:
+                <select id="tricksiness">
+                    <option value="0.1">Easy</option>
+                    <option value="0.3">Moderate</option>
+                    <option value="0.5">Somewhat hard</option>
+                    <option value="0.7">Hard</option>
+                    <option value="0.9">Very hard</option>
+                </select>
+                <button id="newGame" type="button" class="btn btn-primary btn-xs">Go</button>
+            </p>
         </div>
     </div>
     <div class="footer">
@@ -103,7 +114,7 @@
 
 </div>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="lib/jquery-1.10.2.min.js"></script>
 <script src="lib/bootstrap.min.js"></script>
 <script src="src/killerModel.js"></script>
 <script src="src/killerGlue.js"></script>

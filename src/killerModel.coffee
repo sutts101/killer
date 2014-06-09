@@ -213,7 +213,7 @@ class Generator
     worker sudokuWhereAllCellsHaveValueNull, 0
 
 
-  @generateKiller = (sudoku) ->
+  @generateKiller = (sudoku, thresholdForDoubles) ->
 
     mergeAwaySingleCellRegions = (killer) ->
       regionsWithOnlyOneCell = killer.regions.filter (r) => r.cells.length is 1
@@ -238,7 +238,7 @@ class Generator
             return cellToBecomeNeighbour
       return null
 
-    createInitialRegionsArray = (thresholdForDoubles) ->
+    createInitialRegionsArray = ->
       regions = sudoku.cells.map (cell) -> cell
       for region,index in regions
         if regions[index].value?
@@ -256,7 +256,7 @@ class Generator
               regions[index + sudoku.size] = index
       regions
 
-    killerWhereAllRegionsHaveOnlyOneOrTwoCells = new Killer sudoku.values(), createInitialRegionsArray(0.1)
+    killerWhereAllRegionsHaveOnlyOneOrTwoCells = new Killer sudoku.values(), createInitialRegionsArray()
     mergeAwaySingleCellRegions killerWhereAllRegionsHaveOnlyOneOrTwoCells
 
 class SudokuStringifier
