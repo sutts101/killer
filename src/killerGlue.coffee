@@ -1,5 +1,17 @@
 $(document).ready ->
 
+  unless Modernizr.canvas
+    $('body').html '''
+      <div class="container">
+        <h1>Darn it!</h1>
+        <p class="browsehappy">
+            You are using an <strong>outdated</strong> browser - this game ain't gonna work for you.
+            Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.
+        </p>
+      </div>
+    '''
+    return
+
   canvas = new window.KillerCanvas document.getElementById('killer')
 
   newGame = ->
