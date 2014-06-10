@@ -28,8 +28,8 @@
         td {
             padding: 2px;
         }
-        span.highlight {
-            background-color: yellow;
+        td.key, td.explanation {
+            padding-left: 15px;
         }
         div.footer {
             font-size: 12px;
@@ -65,15 +65,37 @@
                     <p>
                         To play:
                     <ul>
-                        <li>Use the mouse and/or cursor keys to focus on a cell</li>
-                        <li>Use the keyboard to enter possible values (for example, if you have a cage with 2 cells and a sum of 3,
-                            go to each cell and enter <span class="highlight">1</span> followed by <span class="highlight">2</span>)</li>
-                        <li>Every time you enter a value, it will add it to the cell if is not already there, else remove</li>
-                        <li>To <b>clear</b> all values from a cell, press <span class="highlight">c</span></li>
-                        <li>To <b>undo</b> previous entry press <span class="highlight">z</span></li>
-                        <li>To <b>redo</b> previous entry press <span class="highlight">y</span></li>
-                        <li>To use the <b>sum calculator</b> on current cell / cage press <span class="highlight">s</span></li>
+                        <li>Use the mouse and/or cursor keys to focus on a cell. Use the keyboard to enter possible values.
+                            For example, if you have a cage with <b>2</b> cells and a sum of <b>3</b>, go to each cell and enter '1' followed by '2'</li>
                     </ul>
+                    <p>
+                        Keyboard:
+                        <table>
+                            <tr>
+                                <td class="key">1-9</td>
+                                <td class="explanation"><b>Toggle</b> value</td>
+                            </tr>
+                            <tr>
+                                <td class="key">Shift 1-9</td>
+                                <td class="explanation"><b>Set</b> value</td>
+                            </tr>
+                            <tr>
+                                <td class="key">c</td>
+                                <td class="explanation"><b>Clear</b> all values in cell</td>
+                            </tr>
+                            <tr>
+                                <td class="key">s</td>
+                                <td class="explanation">Show <b>sum calculator</b> for current cell / cage</td>
+                            </tr>
+                            <tr>
+                                <td class="key">z</td>
+                                <td class="explanation"><b>Undo</b> previous entry</td>
+                            </tr>
+                            <tr>
+                                <td class="key">y</td>
+                                <td class="explanation"><b>Redo</b> (aka undo undo) previous entry</td>
+                            </tr>
+                        </table>
                     </p>
                 </div>
                 <div class="tab-pane fade" id="sumCalculator">

@@ -98,9 +98,11 @@ class Cell
   left:  -> @sudoku.cellAt @row,     @col - 1 unless @col == 0
   right: -> @sudoku.cellAt @row,     @col + 1 unless @col >= (@sudoku.size - 1)
 
-  enter: (value) ->
+  enter: (value, force = false) ->
     if value in @sudoku.validValues
-      if value in @entries
+      if force
+        @entries = [value]
+      else if value in @entries
         @entries = @entries.filter (e) -> e isnt value
       else
         @entries.push value

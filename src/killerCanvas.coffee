@@ -168,7 +168,7 @@ class KillerCanvas
     if @focusCell?
       value = String.fromCharCode(evt.keyCode)
       if evt.keyCode in [49..57]
-        @focusCell.enter parseInt(value)
+        @focusCell.enter parseInt(value), evt.shiftKey
         @redraw(true)
       else if evt.keyCode in [37..40]
         movement = {37: 'left', 38: 'up', 39: 'right', 40: 'down'}[evt.keyCode]

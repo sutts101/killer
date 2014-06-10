@@ -192,6 +192,13 @@ describe "Sudoku", ->
         cell.enter 1
         cell.entriesAsString().should.equal '2'
 
+      it "should force entry if the force flag is set", ->
+        cell = makeCell()
+        cell.enter 1
+        cell.enter 2
+        cell.enter 1, true
+        cell.entriesAsString().should.equal '1'
+
       it "should just ignore invalid entries", ->
         sudoku = new Sudoku A_VALID_4x4_GRID
         cell = sudoku.cellAt 0, 0
