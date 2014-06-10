@@ -55,4 +55,14 @@ $(document).ready ->
 
   $('#sumCalcFooter').on 'click', '.sumCalcIncludes, .sumCalcExcludes', updateSolutionHighlighting
 
+  canvas.keyPressHandler = (value, cell) ->
+    if value is 'S'
+      $('#sumCalcSum').val cell.region.sum()
+      $('#sumCalcLength').val cell.region.cells.length
+      $('#tabsheet a[href="#sumCalculator"]').tab('show')
+      updateCalculatorSolutions()
+      true
+    else
+      false
+
 

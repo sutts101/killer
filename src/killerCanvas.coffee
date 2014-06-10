@@ -178,6 +178,8 @@ class KillerCanvas
       else if evt.keyCode is 67
         @focusCell.entries.length = 0
         @redraw()
+      else if @keyPressHandler? and @focusCell?
+        @keyPressHandler value, @focusCell
       else
         false
 
