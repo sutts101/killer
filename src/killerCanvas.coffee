@@ -29,7 +29,6 @@ class KillerCanvas
     @ctx = canvas.getContext "2d"
 
     @canvas.addEventListener 'mousemove', @_mouseMove
-    window.addEventListener 'keydown', @_keyPress, false
     @canvas.addEventListener 'keydown', @_keyPress, true
 
     @model undefined

@@ -15,6 +15,9 @@
     <![endif]-->
 
     <style>
+        canvas {
+            outline: none;
+        }
         #help {
             float: right;
             width: 600px
@@ -112,7 +115,7 @@
             </div>
         </div>
         <div id="game">
-            <canvas id="killer" width="540" height="540" style="border:2px solid #000000;"></canvas>
+            <canvas id="killer" width="540" height="540" style="border:2px solid #000000;" tabindex="1"></canvas>
             <p>
                 New game:
                 <select id="tricksiness">
