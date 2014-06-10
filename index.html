@@ -22,11 +22,17 @@
         h1 {
             font-size: 24px;
         }
+        td {
+            padding: 2px;
+        }
         span.highlight {
             background-color: yellow;
         }
         div.footer {
             font-size: 12px;
+        }
+        div.filtered {
+            color: lightgray;
         }
     </style>
 
@@ -67,10 +73,25 @@
                     </p>
                 </div>
                 <div class="tab-pane fade" id="sumCalculator">
-                    <h1>Sum calculator</h1>
-                    <p>
-                        Coming soon!
-                    </p>
+                    <div class="panel panel-warning" style="margin-top: 20px">
+                        <div class="panel-heading">
+                            <b>How many ways can you get <input id="sumCalcSum" type="text" size="2"> from <input id="sumCalcLength" type="text" size="1"> cells?</b>
+                        </div>
+                        <div id="sumCalcBody" class="panel-body">
+                        </div>
+                        <div id="sumCalcFooter" class="panel-footer">
+                            <table>
+                                <tr>
+                                    <td>Include:</td>
+                                    <td id="sumCalcIncludes"></td>
+                                </tr>
+                                <tr>
+                                    <td>Exclude:</td>
+                                    <td id="sumCalcExcludes"></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
                 </div>
                 <div class="tab-pane fade" id="about">
                     <h1>About this Killer Sudoku</h1>
@@ -116,9 +137,11 @@
 
 <script src="lib/jquery-1.10.2.min.js"></script>
 <script src="lib/bootstrap.min.js"></script>
+<script src="lib/lodash.min.js"></script>
 <script src="src/killerModel.js"></script>
-<script src="src/killerGlue.js"></script>
 <script src="src/killerCanvas.js"></script>
+<script src="src/sumCalculator.js"></script>
+<script src="src/killerGlue.js"></script>
 
 </body>
 </html>

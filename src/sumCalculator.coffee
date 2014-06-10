@@ -1,4 +1,4 @@
-_ = require 'lodash'
+#_ = require 'lodash'
 
 class SumCalculator
 
