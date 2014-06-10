@@ -2,6 +2,7 @@
 
 chai = require 'chai'
 chai.should()
+json = require 'jsonify'
 
 A_VALID_4x4_GRID = [
   1,2,3,4,
@@ -276,6 +277,48 @@ describe "Sudoku", ->
       sudoku.isComplete().should.equal true
       sudoku.isCompleteWithPreordainedEntries().should.equal true
 
+  describe "JSON friendly persistence", ->
+
+    describe "toObject", ->
+
+      it "should reflect the sudoku values and entries in a stringy kinda way", ->
+        sudoku = new Sudoku A_VALID_4x4_GRID
+        sudoku.toObject().values.should.equal '1,2,3,4,3,4,1,2,2,3,4,1,4,1,2,3'
+        sudoku.toObject().entries.should.equal ',,,,,,,,,,,,,,,'
+
+      it "should capture entries at a point in time", ->
+        sudoku = new Sudoku A_VALID_4x4_GRID
+        sudoku.cellAt(0,0).enter 1
+        sudoku.cellAt(0,0).enter 2
+        sudoku.toObject().entries.should.equal '12,,,,,,,,,,,,,,,'
+
+    describe "fromObject", ->
+
+      it "should be possible to create a new Sudoku from a JSON object", ->
+        obj =
+          values: '1,2,3,4,3,4,1,2,2,3,4,1,4,1,2,3'
+          entries: '12,,,,,,,,,,,,,,,'
+        sudoku = Sudoku.fromObject obj
+        sudoku.cellAt(0,0).value.should.equal 1
+        sudoku.cellAt(0,0).entriesAsString().should.equal '12'
+
+      it "should be possible to round trip to object from object", ->
+        sudoku = new Sudoku A_VALID_4x4_GRID
+        sudoku.cellAt(0,0).enter 1
+        sudoku.cellAt(0,0).enter 2
+        clone = Sudoku.fromObject sudoku.toObject()
+        sudoku.toObject().values.should.equal clone.toObject().values
+        sudoku.toObject().entries.should.equal clone.toObject().entries
+
+      it "should be possible to round trip via json as well", ->
+        sudoku = new Sudoku A_VALID_4x4_GRID
+        sudoku.cellAt(0,0).enter 1
+        sudoku.cellAt(0,0).enter 2
+        sudokuAsJsonString = json.stringify sudoku.toObject()
+        clone = Sudoku.fromObject json.parse(sudokuAsJsonString)
+        sudoku.toObject().values.should.equal clone.toObject().values
+        sudoku.toObject().entries.should.equal clone.toObject().entries
+
 describe "Killer", ->
 
   it "should complain if length of regions array does not match that of values array", ->
@@ -295,24 +338,43 @@ describe "Killer", ->
     7,7,8,8
   ]
 
-  killer = new Killer values, regions
-
   it "should be able to round trip region ids", ->
+    killer = new Killer values, regions
     killer.regionIds().join('').should.equal regions.join ''
 
   it "should create 8 regions", ->
+    killer = new Killer values, regions
     killer.regions.length.should.equal 8
 
   it "should set the regions up correctly such that region sums are as they should be", ->
+    killer = new Killer values, regions
     killer.regions[0].sum().should.equal 8
     killer.regions[7].sum().should.equal 5
 
   it "should start out incomplete", ->
+    killer = new Killer values, regions
     killer.isComplete().should.equal false
 
   it "should recognise completion", ->
+    killer = new Killer values, regions
     cell.enter cell.value for cell in killer.cells
     killer.isComplete().should.equal true
+
+  it "should do toObject() to return an object with string representation of cages as well as values and entries", ->
+    killer = new Killer values, regions
+    killer.toObject().values.should.equal '4,1,2,3,3,2,4,1,1,4,3,2,2,3,1,4'
+    killer.toObject().entries.should.equal ',,,,,,,,,,,,,,,'
+    killer.toObject().regions.should.equal '1,1,2,2,1,3,4,2,5,5,6,6,7,7,8,8'
+
+  it "should be possible to create a new Killer from a JSON object", ->
+    obj =
+      values: '4,1,2,3,3,2,4,1,1,4,3,2,2,3,1,4'
+      entries: '12,,,,,,,,,,,,,,,'
+      regions: '1,1,2,2,1,3,4,2,5,5,6,6,7,7,8,8'
+    cell = Killer.fromObject(obj).cellAt 0, 0
+    cell.value.should.equal 4
+    cell.entriesAsString().should.equal '12'
+    cell.region.id.should.equal 1
 
 describe "Region", ->
 

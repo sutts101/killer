@@ -40,6 +40,8 @@ class Sudoku
 
   cellAt: (row, col) -> @cells[(row * @size) + col]
 
+  cellAtIndex: (index) -> @cells[index]
+
   values: -> @cells.map (cell) => cell.value
 
   isComplete: ->
@@ -52,6 +54,23 @@ class Sudoku
     for cell in @cells
       return false unless cell.hasPreordainedEntry()
     true
+
+  toObject: ->
+    {
+      values: @values().join ','
+      entries: (@cells.map (cell) -> cell.entriesAsString()).join ','
+    }
+
+  applyEntriesFromObject: (obj) ->
+    for entry,index in obj.entries.split(',')
+      for i in [0..entry.length]
+        @cellAtIndex(index).enter parseInt(entry.charAt(i))
+
+  @fromObject: (obj) ->
+    values = obj.values.split(',').map (s) -> parseInt(s)
+    sudoku = new Sudoku values
+    sudoku.applyEntriesFromObject obj
+    sudoku
 
 class CellBlock
 
@@ -138,9 +157,7 @@ class Killer extends Sudoku
     throw new Error "Incorrect number of regions you bozo" unless regionIds.length is @cells.length
     @regions= []
     for regionId,index in regionIds
-      row = Math.floor(index / @size)
-      col = index % @size
-      cell = @cellAt row, col
+      cell = @cellAtIndex index
       region = (@regions.filter (r) -> r.id is regionId)[0]
       unless region
         region = new Region regionId
@@ -160,6 +177,18 @@ class Killer extends Sudoku
     for region in @regions
       return false unless region.isComplete()
     true
+
+  toObject: ->
+    obj = super
+    obj.regions = @regionIds().join ','
+    obj
+
+  @fromObject: (obj) ->
+    regionIds = obj.regions.split(',').map (s) -> parseInt(s)
+    sudoku = Sudoku.fromObject obj
+    killer = new Killer sudoku.values(), regionIds
+    killer.applyEntriesFromObject obj
+    killer
 
 class Region extends CellBlock
 
