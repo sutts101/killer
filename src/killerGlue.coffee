@@ -6,23 +6,49 @@ $(document).ready ->
         <h1>Darn it!</h1>
         <p class="browsehappy">
             You are using an <strong>outdated</strong> browser - this game ain't gonna work for you.
-            Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.
+            Please <a href="http://browsehappy.com/">upgrade your browser</a>.
         </p>
       </div>
     '''
     return
 
-  canvas = new window.KillerCanvas document.getElementById('killer')
+  persistor = new Persistor window.localStorage, 'com.holonesque.sudoku.killer'
+
+  widgetForLevel = $('#level')
+  widgetForNewGame = $('#newGame')
+
+  level = persistor.get 'level', widgetForLevel.val()
+  widgetForLevel.val level
+  widgetForLevel.on 'change', ->
+    level = widgetForLevel.val()
+    persistor.set 'level', level
+
+  killerCanvas = new window.KillerCanvas document.getElementById('killer')
+
+  setGame = (killer) ->
+    persistor.set 'game', JSON.stringify killer.toObject()
+    killerCanvas.model killer
+    killer
 
   newGame = ->
-    tricksiness = parseFloat $('#tricksiness').val()
     sudoku = Generator.generateSudoku 3
-    killer = Generator.generateKiller sudoku, tricksiness
-    canvas.model killer
-  $('#newGame').on 'click', newGame
-  $('#tricksiness').on 'change', newGame
-  newGame()
+    killer = Generator.generateKiller sudoku, parseFloat(level)
+    setGame killer
 
+  restoreGame = ->
+    previousGame = persistor.get 'game'
+    if previousGame?
+      killer = Killer.fromObject JSON.parse(previousGame)
+      setGame killer
+
+  widgetForNewGame.on 'click', newGame
+  widgetForLevel.on 'change', newGame
+
+  restoreGame() ? newGame()
+
+  # =================================
+  #      Sum Calculator UI
+  # =================================
 
   calculator = new window.SumCalculator 9
   sumCalcBody = $('#sumCalcBody')
@@ -67,7 +93,7 @@ $(document).ready ->
 
   $('#sumCalcFooter').on 'click', '.sumCalcIncludes, .sumCalcExcludes', updateSolutionHighlighting
 
-  canvas.keyPressHandler = (value, cell) ->
+  killerCanvas.keyPressHandler = (value, cell) ->
     if value is 'S'
       $('#sumCalcSum').val cell.region.sum()
       $('#sumCalcLength').val cell.region.cells.length
@@ -76,5 +102,8 @@ $(document).ready ->
       true
     else
       false
+
+
+
 
 
