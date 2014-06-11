@@ -22,6 +22,7 @@ class KillerCanvas
   COLOR_FOR_FOCUS:       'yellow'
   COLOR_FOR_ENTRIES:     'darkblue'
   COLOR_FOR_BAD_ENTRIES: 'darkred'
+  FONT:                  'Helvetica Neue'
 
   constructor: (@canvas) ->
     @size = @canvas.width
@@ -44,7 +45,7 @@ class KillerCanvas
       @ctx.fillStyle = "darkgreen"
       @ctx.fillRect 0, 0, @size, @size
       @ctx.fillStyle = "#EEEEEE"
-      @ctx.font = "40px Arial"
+      @ctx.font = "40px #{@FONT}"
       @ctx.textAlign = 'center'
       @ctx.textBaseline = 'middle'
       rect = new Rectangle 0, 0, @size, @size
@@ -52,7 +53,7 @@ class KillerCanvas
       console.log "Although that is not the exact solution I had in mind..." unless @killer.isCompleteWithPreordainedEntries()
     else
       @ctx.setLineDash [1000]
-      @ctx.fillStyle = "#EEEEEE"
+      @ctx.fillStyle = "white"
       @ctx.fillRect 0, 0, @size, @size
       if not @killer?
         @_drawGridLines 9, @COLOR_FOR_GRID_LINES, @MINOR_GRID_LINE
@@ -62,8 +63,8 @@ class KillerCanvas
         @_drawGridLines Math.sqrt(@killer.size), @COLOR_FOR_GRID_LINES, @MAJOR_GRID_LINE
         @_assignCellBounds()
         @_drawRegions()
-        @_drawRegionSums()
         @_drawFocus()
+        @_drawRegionSums()
         @_drawEntries()
 
   _assignCellBounds: ->
@@ -120,7 +121,7 @@ class KillerCanvas
 
   _drawRegionSums: () ->
     @ctx.fillStyle = @COLOR_FOR_REGIONS
-    @ctx.font = "bold 12px Arial"
+    @ctx.font = "bold 12px #{@FONT}"
     @ctx.textAlign = 'left'
     @ctx.textBaseline = 'top'
     for region in @killer.regions
@@ -130,7 +131,7 @@ class KillerCanvas
 
   _drawFocus: () ->
     if @focusCell?
-      rect = @focusCell.bounds.innerRect 3.5 * @REGION_INSET
+      rect = @focusCell.bounds.innerRect 1.5 * @REGION_INSET
       @ctx.fillStyle = @COLOR_FOR_FOCUS
       @ctx.fillRect rect.x, rect.y, rect.w, rect.h
 
@@ -151,7 +152,7 @@ class KillerCanvas
             @ctx.fillStyle = @COLOR_FOR_BAD_ENTRIES
           else
             @ctx.fillStyle = @COLOR_FOR_ENTRIES
-          @ctx.font = "#{fontSize(cell.entries.length)}px Arial"
+          @ctx.font = "#{fontSize(cell.entries.length)}px #{@FONT}"
           x = cell.bounds.middle().x - (@ctx.measureText(cell.entriesAsString()).width / 2)
           y = cell.bounds.middle().y
           @ctx.fillText cell.entriesAsString(), x, y
