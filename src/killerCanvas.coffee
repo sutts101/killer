@@ -24,16 +24,26 @@ class KillerCanvas
   COLOR_FOR_BAD_ENTRIES: 'darkred'
   FONT:                  'Helvetica Neue'
 
-  constructor: (@canvas) ->
+  constructor: (@canvasElement) ->
+    @canvas = @canvasElement[0]
     @size = @canvas.width
-    console.log "The canvas ain't square you bozo - this won't render very well" unless canvas.width is canvas.height
+    console.log "The canvas ain't square you bozo - this won't render very well" unless @canvas.width is @canvas.height
 
-    @ctx = canvas.getContext "2d"
-
-    @canvas.addEventListener 'mousemove', @_mouseMove
-    @canvas.addEventListener 'keydown', @_keyPress, true
+    @ctx = @canvas.getContext "2d"
+    @hasFocus = false
 
     @model undefined
+
+    @canvasElement.mousemove @_mouseMove
+    @canvasElement.keydown @_keyPress
+    @canvasElement.focusin =>
+      @hasFocus = true
+      @redraw()
+    @canvasElement.focusout =>
+      @hasFocus = false
+      @redraw()
+    @canvasElement.mouseenter =>
+      @canvasElement.focus()
 
   model: (@killer) ->
     @focusCell = @killer?.cellAt 0, 0
@@ -63,7 +73,7 @@ class KillerCanvas
         @_drawGridLines Math.sqrt(@killer.size), @COLOR_FOR_GRID_LINES, @MAJOR_GRID_LINE
         @_assignCellBounds()
         @_drawRegions()
-        @_drawFocus()
+        @_drawFocus() if @hasFocus
         @_drawRegionSums()
         @_drawEntries()
 

@@ -23,7 +23,8 @@ $(document).ready ->
     level = widgetForLevel.val()
     persistor.set 'level', level
 
-  killerCanvas = new window.KillerCanvas document.getElementById('killer')
+  killerCanvasElement = $('#killer')
+  killerCanvas = new window.KillerCanvas killerCanvasElement
 
   setGame = (killer) ->
     killer.changeListener =
@@ -36,6 +37,7 @@ $(document).ready ->
     sudoku = Generator.generateSudoku 3
     killer = Generator.generateKiller sudoku, parseFloat(level)
     setGame killer
+    killerCanvasElement.focus()
 
   restoreGame = ->
     previousGame = persistor.get 'game'
