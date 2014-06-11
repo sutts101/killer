@@ -27,9 +27,9 @@ $(document).ready ->
   killerCanvas = new window.KillerCanvas killerCanvasElement
 
   setGame = (killer) ->
-    killer.changeListener =
-      changed: (killer) ->
-        persistor.set 'game', JSON.stringify killer.toObject()
+    killer.changeListeners.push {
+      changed: (killer) -> persistor.set 'game', JSON.stringify killer.toObject()
+    }
     killerCanvas.model killer
     killer
 
