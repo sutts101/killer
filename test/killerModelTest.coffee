@@ -319,7 +319,7 @@ describe "Sudoku", ->
         sudoku.toObject().values.should.equal clone.toObject().values
         sudoku.toObject().entries.should.equal clone.toObject().entries
 
-  describe "change and history", ->
+  describe "change and undo / redo", ->
 
     sudoku = null
     cell = null
@@ -331,15 +331,68 @@ describe "Sudoku", ->
         numChanges: 0
         changed: (sudoku) -> @numChanges++
 
-    it "should call the listener every time there is a change", ->
-      cell.enter 1
-      cell.enter 2
-      sudoku.changeListener.numChanges.should.equal 2
+    describe "change listener", ->
 
-    it "should not explode if there is no change listener", ->
-      sudoku.changeListener = undefined
-      cell.enter 1
-      cell.enter 2
+      it "should call the listener every time there is a change", ->
+        cell.enter 1
+        cell.enter 2
+        sudoku.changeListener.numChanges.should.equal 2
+
+      it "should call the listener every time there is a change (and only if there is a change)", ->
+        cell.enter 1, true
+        cell.enter 1, true
+        cell.enter 'banana'
+        sudoku.changeListener.numChanges.should.equal 1
+
+      it "should not explode if there is no change listener", ->
+        sudoku.changeListener = undefined
+        cell.enter 1
+        cell.enter 2
+
+    describe "undo / redo", ->
+
+      undoAndExpect = (expected) ->
+        sudoku.undo()
+        cell.entriesAsString().should.equal expected
+
+      redoAndExpect = (expected) ->
+        sudoku.redo()
+        cell.entriesAsString().should.equal expected
+
+      it "should be able to undo and redo previous entries (and not explode if there is nothing to do)", ->
+        cell.enter value for value in [1,2,3]
+        cell.entriesAsString().should.equal '123'
+        undoAndExpect '12'
+        undoAndExpect '1'
+        undoAndExpect ''
+        undoAndExpect ''
+        redoAndExpect '1'
+        redoAndExpect '12'
+        redoAndExpect '123'
+        redoAndExpect '123'
+        undoAndExpect '12'
+        redoAndExpect '123'
+
+      it "should still undo/redo correctly for forced entries", ->
+        cell.enter value, true for value in [1,2,3]
+        cell.entriesAsString().should.equal '3'
+        undoAndExpect '2'
+        redoAndExpect '3'
+        undoAndExpect '2'
+        undoAndExpect '1'
+        undoAndExpect ''
+        undoAndExpect ''
+        redoAndExpect '1'
+
+      it "should reset history jumping whenever there is an explicit entry ", ->
+        cell.enter value for value in [1,2,3]
+        cell.entriesAsString().should.equal '123'
+        undoAndExpect '12'
+        cell.enter 4, true
+        redoAndExpect '4'
+        redoAndExpect '4'
+        undoAndExpect '12'
+        redoAndExpect '4'
 
 describe "Killer", ->
 
@@ -424,7 +477,7 @@ describe "Region", ->
     region.push new Cell MOCK_VALID_SUDOKU, 3, 3, 4
     ( -> region.validate() ).should.throw "Non-contiguous cell 3,3:4 pushed to region 'whatever' you bozo"
 
-  it "should test incompleteness based on sum of region and nothing else", ->
+  xit "should test incompleteness based on sum of region and nothing else", ->
 
     region = new Region 'whatever'
     region.push new Cell MOCK_VALID_SUDOKU, 1, 1, 2

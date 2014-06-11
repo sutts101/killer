@@ -38,11 +38,31 @@ class Sudoku
         boxIndex = (Math.floor(row / @root) * @root) + Math.floor(col / @root)
         @boxes[boxIndex].push cell
 
+    @undoRedoHistory = []
+
   cellAt: (row, col) -> @cells[(row * @size) + col]
 
   cellAtIndex: (index) -> @cells[index]
 
   values: -> @cells.map (cell) => cell.value
+
+  changed: (command) ->
+    @undoRedoHistory.push command
+    @undoRedoIndex = @undoRedoHistory.length
+    @changeListener?.changed? this
+
+  _undoRedo: (isUndo = true) ->
+    if @undoRedoIndex >= 0
+      if isUndo and @undoRedoIndex > 0
+        @undoRedoIndex--
+        @undoRedoHistory[@undoRedoIndex].undo()
+      else if not isUndo and @undoRedoIndex < @undoRedoHistory.length
+        @undoRedoHistory[@undoRedoIndex].redo()
+        @undoRedoIndex++
+
+  undo: -> @_undoRedo true
+
+  redo: -> @_undoRedo false
 
   isComplete: ->
     for block in @blocks
@@ -119,13 +139,19 @@ class Cell
 
   enter: (value, force = false) ->
     if value in @sudoku.validValues
+      before = @entries[0..@entries.length]
       if force
         @entries = [value]
       else if value in @entries
         @entries = @entries.filter (e) -> e isnt value
       else
         @entries.push value
-      @sudoku.changeListener?.changed?(@sudoku)
+      after = @entries[0..@entries.length]
+      unless before.join('') is after.join('s') # cheap test for array equivalency
+        command =
+          undo: => @entries = before
+          redo: => @entries = after
+        @sudoku.changed command
 
   entriesAsString: () -> @entries.join ''
 

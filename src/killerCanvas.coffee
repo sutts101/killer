@@ -175,8 +175,14 @@ class KillerCanvas
         if @focusCell[movement]()?
           @focusCell = @focusCell[movement]()
           @redraw()
-      else if evt.keyCode is 67
+      else if value is 'C'
         @focusCell.entries.length = 0
+        @redraw()
+      else if value is 'Z'
+        @killer.undo()
+        @redraw()
+      else if value is 'Y'
+        @killer.redo()
         @redraw()
       else if @keyPressHandler? and @focusCell?
         @keyPressHandler value, @focusCell
