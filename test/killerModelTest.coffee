@@ -453,7 +453,7 @@ describe "Killer", ->
 
 describe "Region", ->
 
-  MOCK_VALID_SUDOKU = {size: 4, root: 2, validValues: [1,2,3,4]}
+  MOCK_VALID_SUDOKU = {size: 4, root: 2, validValues: [1,2,3,4], changed: ->}
 
   it "should know whether a cell is contained or not", ->
 
@@ -477,7 +477,7 @@ describe "Region", ->
     region.push new Cell MOCK_VALID_SUDOKU, 3, 3, 4
     ( -> region.validate() ).should.throw "Non-contiguous cell 3,3:4 pushed to region 'whatever' you bozo"
 
-  xit "should test incompleteness based on sum of region and nothing else", ->
+  it "should test incompleteness based on sum of region and nothing else", ->
 
     region = new Region 'whatever'
     region.push new Cell MOCK_VALID_SUDOKU, 1, 1, 2
