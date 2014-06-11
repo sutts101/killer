@@ -13,14 +13,15 @@ class Rectangle
 
 class KillerCanvas
 
-  MAJOR_GRID_LINE:      3
-  MINOR_GRID_LINE:      1
-  REGION_INSET:         5
-  REGION_SUM_INSET:     3
-  COLOR_FOR_GRID_LINES: 'black'
-  COLOR_FOR_REGIONS:    'darkgreen'
-  COLOR_FOR_FOCUS:      'yellow'
-  COLOR_FOR_ENTRIES:    'darkblue'
+  MAJOR_GRID_LINE:       3
+  MINOR_GRID_LINE:       1
+  REGION_INSET:          5
+  REGION_SUM_INSET:      3
+  COLOR_FOR_GRID_LINES:  'black'
+  COLOR_FOR_REGIONS:     'darkgreen'
+  COLOR_FOR_FOCUS:       'yellow'
+  COLOR_FOR_ENTRIES:     'darkblue'
+  COLOR_FOR_BAD_ENTRIES: 'darkred'
 
   constructor: (@canvas) ->
     @size = @canvas.width
@@ -35,6 +36,7 @@ class KillerCanvas
 
   model: (@killer) ->
     @focusCell = @killer?.cellAt 0, 0
+    @killer?.changeListeners.push this
     @redraw()
 
   redraw: (checkForCompletion = false) =>
@@ -140,12 +142,15 @@ class KillerCanvas
         13
       else
         10
-    @ctx.fillStyle = @COLOR_FOR_ENTRIES
     @ctx.textBaseline = 'middle'
     for row in [0...@killer.size]
       for col in [0...@killer.size]
         cell = @killer.cellAt row, col
         if cell.entries.length > 0
+          if cell.flaggedAsDodgy is true
+            @ctx.fillStyle = @COLOR_FOR_BAD_ENTRIES
+          else
+            @ctx.fillStyle = @COLOR_FOR_ENTRIES
           @ctx.font = "#{fontSize(cell.entries.length)}px Arial"
           x = cell.bounds.middle().x - (@ctx.measureText(cell.entriesAsString()).width / 2)
           y = cell.bounds.middle().y
@@ -163,6 +168,14 @@ class KillerCanvas
     if cell isnt @focusCell
       @focusCell = cell
       @redraw()
+
+  _verify: ->
+    for cell in @killer.cells
+      cell.flaggedAsDodgy = cell.entries.length > 0 and cell.value not in cell.entries
+
+  # callback via Sudoku.ChangeListener
+  changed: (sudoku, cell) ->
+    cell.flaggedAsDodgy = false
 
   _keyPress: (evt) =>
     if @focusCell?
@@ -184,10 +197,14 @@ class KillerCanvas
       else if value is 'Y'
         @killer.redo()
         @redraw()
+      else if value is 'V'
+        @_verify()
+        @redraw()
       else if @keyPressHandler? and @focusCell?
         @keyPressHandler value, @focusCell
       else
         false
+
 
 root = exports ? window
 root.KillerCanvas = KillerCanvas

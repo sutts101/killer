@@ -321,35 +321,14 @@ describe "Sudoku", ->
 
   describe "change and undo / redo", ->
 
-    sudoku = null
-    cell = null
-
-    beforeEach ->
-      sudoku = new Sudoku A_VALID_4x4_GRID
-      cell = sudoku.cellAt 0, 0
-      sudoku.changeListener =
-        numChanges: 0
-        changed: (sudoku) -> @numChanges++
-
-    describe "change listener", ->
-
-      it "should call the listener every time there is a change", ->
-        cell.enter 1
-        cell.enter 2
-        sudoku.changeListener.numChanges.should.equal 2
-
-      it "should call the listener every time there is a change (and only if there is a change)", ->
-        cell.enter 1, true
-        cell.enter 1, true
-        cell.enter 'banana'
-        sudoku.changeListener.numChanges.should.equal 1
-
-      it "should not explode if there is no change listener", ->
-        sudoku.changeListener = undefined
-        cell.enter 1
-        cell.enter 2
-
     describe "undo / redo", ->
+
+      sudoku = null
+      cell = null
+
+      beforeEach ->
+        sudoku = new Sudoku A_VALID_4x4_GRID
+        cell = sudoku.cellAt 0, 0
 
       undoAndExpect = (expected) ->
         sudoku.undo()
@@ -393,6 +372,45 @@ describe "Sudoku", ->
         redoAndExpect '4'
         undoAndExpect '12'
         redoAndExpect '4'
+
+    describe "change listener notifications", ->
+
+      changeListener = null
+      sudoku = null
+      cell = null
+
+      beforeEach ->
+        changeListener =
+          numChanges: 0
+          lastAffectedCell: null
+          changed: (sudoku, cell) ->
+            @numChanges++
+            @lastAffectedCell = cell
+        sudoku = new Sudoku A_VALID_4x4_GRID
+        cell = sudoku.cellAt 0, 0
+        sudoku.changeListeners.push changeListener
+
+      it "should call the listener every time there is a change", ->
+        cell.enter 1
+        cell.enter 2
+        changeListener.numChanges.should.equal 2
+
+      it "should call the listener every time there is a change (and only if there is a change)", ->
+        cell.enter 1, true
+        cell.enter 1, true
+        cell.enter 'banana'
+        changeListener.numChanges.should.equal 1
+
+      it "listener callback should identify the cell to which the change applies", ->
+        cell.enter 1
+        changeListener.lastAffectedCell.should.equal cell
+
+      it "listener callback should work for undo / redo as well as enter", ->
+        cell.enter 1
+        sudoku.undo()
+        sudoku.redo()
+        changeListener.numChanges.should.equal 3
+        changeListener.lastAffectedCell.should.equal cell
 
 describe "Killer", ->
 

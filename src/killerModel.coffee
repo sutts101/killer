@@ -38,6 +38,7 @@ class Sudoku
         boxIndex = (Math.floor(row / @root) * @root) + Math.floor(col / @root)
         @boxes[boxIndex].push cell
 
+    @changeListeners = []
     @undoRedoHistory = []
 
   cellAt: (row, col) -> @cells[(row * @size) + col]
@@ -46,19 +47,27 @@ class Sudoku
 
   values: -> @cells.map (cell) => cell.value
 
+  _notifyChangeListeners: (cell) ->
+    for changeListener in @changeListeners
+      changeListener.changed this, cell
+
   changed: (command) ->
     @undoRedoHistory.push command
     @undoRedoIndex = @undoRedoHistory.length
-    @changeListener?.changed? this
+    @_notifyChangeListeners command.cell
 
   _undoRedo: (isUndo = true) ->
     if @undoRedoIndex >= 0
       if isUndo and @undoRedoIndex > 0
         @undoRedoIndex--
-        @undoRedoHistory[@undoRedoIndex].undo()
+        command = @undoRedoHistory[@undoRedoIndex]
+        command.undo()
+        @_notifyChangeListeners(command.cell)
       else if not isUndo and @undoRedoIndex < @undoRedoHistory.length
-        @undoRedoHistory[@undoRedoIndex].redo()
+        command = @undoRedoHistory[@undoRedoIndex]
+        command.redo()
         @undoRedoIndex++
+        @_notifyChangeListeners(command.cell)
 
   undo: -> @_undoRedo true
 
@@ -151,6 +160,7 @@ class Cell
         command =
           undo: => @entries = before
           redo: => @entries = after
+          cell: @
         @sudoku.changed command
 
   entriesAsString: () -> @entries.join ''
