@@ -125,6 +125,7 @@ class Cell
         @entries = @entries.filter (e) -> e isnt value
       else
         @entries.push value
+      @sudoku.changeListener?.changed?(@sudoku)
 
   entriesAsString: () -> @entries.join ''
 

@@ -319,6 +319,28 @@ describe "Sudoku", ->
         sudoku.toObject().values.should.equal clone.toObject().values
         sudoku.toObject().entries.should.equal clone.toObject().entries
 
+  describe "change and history", ->
+
+    sudoku = null
+    cell = null
+
+    beforeEach ->
+      sudoku = new Sudoku A_VALID_4x4_GRID
+      cell = sudoku.cellAt 0, 0
+      sudoku.changeListener =
+        numChanges: 0
+        changed: (sudoku) -> @numChanges++
+
+    it "should call the listener every time there is a change", ->
+      cell.enter 1
+      cell.enter 2
+      sudoku.changeListener.numChanges.should.equal 2
+
+    it "should not explode if there is no change listener", ->
+      sudoku.changeListener = undefined
+      cell.enter 1
+      cell.enter 2
+
 describe "Killer", ->
 
   it "should complain if length of regions array does not match that of values array", ->
