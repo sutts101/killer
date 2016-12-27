@@ -1,5 +1,7 @@
 # Ian's killer sudoku
 
+[See it in action](https://sutts101.github.io/killer/)
+
 ## Setup
 
 ```
