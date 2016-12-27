@@ -1,0 +1,25 @@
+{
+  "name": "killer",
+  "version": "0.0.1",
+  "description": "Killer Sudoku (coffeescript)",
+  "scripts": {
+    "build": "webpack",
+    "build:watch": "webpack --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://sutts@bitbucket.org/sutts/killer.git"
+  },
+  "author": "sutts101",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/sutts/killer#readme",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "coffee-loader": "^0.7.2",
+    "coffee-script": "^1.12.2",
+    "jsonify": "0.0.0",
+    "lodash": "^4.17.3",
+    "mocha": "^3.2.0",
+    "webpack": "^1.14.0"
+  }
+}

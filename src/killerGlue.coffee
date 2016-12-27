@@ -1,3 +1,8 @@
+{Persistor} = require './persistor.coffee'
+{KillerCanvas} = require './killerCanvas.coffee'
+{Generator} = require './killerModel.coffee'
+{SumCalculator} = require './sumCalculator.coffee'
+
 $(document).ready ->
 
   unless Modernizr.canvas
@@ -24,7 +29,7 @@ $(document).ready ->
     persistor.set 'level', level
 
   killerCanvasElement = $('#killer')
-  killerCanvas = new window.KillerCanvas killerCanvasElement
+  killerCanvas = new KillerCanvas killerCanvasElement
 
   setGame = (killer) ->
     killer.changeListeners.push {
@@ -54,7 +59,7 @@ $(document).ready ->
   #      Sum Calculator UI
   # =================================
 
-  calculator = new window.SumCalculator 9
+  calculator = new SumCalculator 9
   sumCalcBody = $('#sumCalcBody')
   sumCalcFooter = $('#sumCalcFooter')
 
