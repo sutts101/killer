@@ -1,6 +1,6 @@
 {Persistor} = require './persistor.coffee'
 {KillerCanvas} = require './killerCanvas.coffee'
-{Generator} = require './killerModel.coffee'
+{Sudoku, Cell, Killer, Region, Generator} = require './killerModel.coffee'
 {SumCalculator} = require './sumCalculator.coffee'
 
 $(document).ready ->
