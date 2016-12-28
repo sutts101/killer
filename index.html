@@ -7,20 +7,32 @@
 
     <title>Ian's Killer Sudoku</title>
 
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-
-    <!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    
+    <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha256-/SIrNqv8h6QGKDuNoLGA4iret+kyesCkHGzVUUV0shc=" crossorigin="anonymous"></script>    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js" crossorigin="anonymous"></script>
 
     <style>
+        body {
+            padding-top: 20px;
+        }
         canvas {
             outline: none;
+            border: 2px solid;
         }
-        #help {
-            float: right;
-            width: 600px
+        div.col-left {
+            width: 560px;
+            position: fixed;
+        }
+        form.form-inline {
+            padding-top: 15px;
+        }
+        form.form-inline > button {
+            margin-left: 8px;
+        }
+        div.col-right {
+            padding-left: 580px;
         }
         h1 {
             font-size: 24px;
@@ -32,20 +44,46 @@
             padding-left: 15px;
         }
         div.footer {
-            font-size: 12px;
+            font-size: 10px;
         }
         div.filtered {
             color: lightgray;
+        }
+        #sumCalculator > .panel {
+            margin-top: 20px;
         }
     </style>
 
 </head>
 
 <body>
-<p></p>
-<div class="container">
+<div class="container visible-xs-block visible-sm-block">
+    <h1>Confession time...</h1>
+    <p>
+        <b>Ian's Killer Sudoku</b> uses HTML canvas with some absolute fonts and doesn't scale down terribly 
+        well. Truth be told, with your current screen resolution, it would look a bit shit. So better not to show at all (for now). 
+        Sorry about that...
+    </p>
+</div>
+<div class="container visible-md-block visible-lg-block">
     <div class="row">
-        <div id="help">
+        <div id="game" class="col-left">
+            <canvas id="killer" width="540" height="540"></canvas>
+            <form class="form-inline">
+                <div class="form-group">
+                    <label for="level">New game:</label>
+                    <select id="level">
+                        <option value="0.1">Easy</option>
+                        <option value="0.3">Moderate</option>
+                        <option value="0.5">Somewhat hard</option>
+                        <option value="0.7">Hard</option>
+                        <option value="0.9">Very hard</option>
+                    </select>
+                </div>
+                <button id="newGame" type="button" class="btn btn-primary btn-xs">Go</button>
+            </form>           
+        </div>
+        <div id="help" class="col-right">
             <ul id="tabsheet" class="nav nav-tabs" data-tabs="tabs">
                 <li class="active"><a href="#home" data-toggle="tab">Home</a></li>
                 <li><a href="#sumCalculator" data-toggle="tab">Sum calculator</a></li>
@@ -99,7 +137,7 @@
                     </p>
                 </div>
                 <div class="tab-pane fade" id="sumCalculator">
-                    <div class="panel panel-warning" style="margin-top: 20px">
+                    <div class="panel panel-warning" xxxstyle="margin-top: 20px">
                         <div class="panel-heading">
                             <b>How many ways can you get <input id="sumCalcSum" type="text" size="2"> from <input id="sumCalcLength" type="text" size="1"> cells?</b>
                         </div>
@@ -122,48 +160,29 @@
                 <div class="tab-pane fade" id="about">
                     <h1>About this Killer Sudoku</h1>
                     <p>
-                        Written in CoffeeScript with copious help from <a href="http://visionmedia.github.io/mocha/" target="_blank">Mocha</a> +
-                        <a href="https://github.com/visionmedia/should.js" target="_blank">should.js</a>. Uses HTML5 Canvas / Local Storage for render and persistence.
+                        Wrote this as a pet project in about 3 weeks in 2014. Proof (to me anyway) of the beauty of CoffeeScript syntax.
                     </p>
                     <p>
-                        My first goal was to get it to the point where it works and is at least as good any other player I've ever seen.
-                        I think I'm well on the way to achieving that - please let me know if you think differently!!</p>
+                        Quick refresh end of 2016 when my dodgy hosting solution stopped working, including moving from bitbucket to github and
+                        plugging in Webpack for the build. 
                     </p>
                     <p>
-                        A really interesting challenge with Sudokus in general is to write a Solver that thinks like a human (as opposed to
-                        just applying computational brute force). That could open the door to some features to help (really help!) a user when
-                        they're stuck. This is something I'm hoping to have a play with a little further down the road...
+                        When I first wrote this I had been planning to add live tips to help a user solve the current Sudoku, the interesting bit here 
+                        being trying to mirror the human thought process (as opposed to simply applying computational brute force). Maybe I will 
+                        still get to this some day (even if I have to swallow my CoffeeScript pride and vomit it up as ES6). We'll see... 
                     </p>
                 </div>
             </div>
-        </div>
-        <div id="game">
-            <canvas id="killer" width="540" height="540" style="border:2px solid #000000;" tabindex="1"></canvas>
-            <p>
-                New game:
-                <select id="level">
-                    <option value="0.1">Easy</option>
-                    <option value="0.3">Moderate</option>
-                    <option value="0.5">Somewhat hard</option>
-                    <option value="0.7">Hard</option>
-                    <option value="0.9">Very hard</option>
-                </select>
-                <button id="newGame" type="button" class="btn btn-primary btn-xs">Go</button>
-            </p>
+            <div class="footer">
+                <hr>
+                <footer>
+                    <p class="text-right"><a href="https://github.com/sutts101/killer">&copy; 2014-2016 Ian Sutton</a></p>
+                </footer>
+            </div>
         </div>
     </div>
-    <div class="footer">
-        <hr>
-        <footer>
-            <p>&copy; holonesque.com.au 2014</p>
-        </footer>
-    </div>
-
 </div>
 
-<script src="lib/modernizr-2.6.2.min.js"></script>
-<script src="lib/jquery-1.10.2.min.js"></script>
-<script src="lib/bootstrap.min.js"></script>
 <script src="dist/bundle.js"></script>
 
 </body>
